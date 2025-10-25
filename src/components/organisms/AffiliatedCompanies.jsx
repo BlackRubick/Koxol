@@ -14,7 +14,16 @@ const AffiliatedCompanies = () => {
       <div className="companies-list">
         {companies.map((company, index) => (
           <div key={index} className="company-card">
-            <img src={company.logo} alt={`${company.name} logo`} className="company-logo" style={company.style || {}} />
+            <img 
+              src={company.logo} 
+              alt={`${company.name} logo`} 
+              className="company-logo" 
+              style={company.style || {}} 
+              onError={(e) => {
+                e.target.src = '/placeholder.png';
+                e.target.alt = 'Imagen no disponible';
+              }}
+            />
           </div>
         ))}
       </div>
