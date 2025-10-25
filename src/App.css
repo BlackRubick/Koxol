@@ -108,3 +108,67 @@ header, footer {
 input[type="range"] {
   accent-color: var(--lime);
 }
+
+/* Estilos para los apartados del inicio */
+.hero {
+  background-color: var(--forest-green);
+  color: var(--lime);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.benefits {
+  background-color: var(--grass);
+  color: var(--earth);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.history {
+  background-color: var(--earth);
+  color: var(--lime);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.memberships {
+  background-color: var(--grass);
+  color: var(--lime);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.testimonials {
+  background-color: var(--forest-green);
+  color: var(--lime);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.familia {
+  background-color: var(--earth);
+  color: var(--lime);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.customer-service {
+  background-color: var(--grass);
+  color: var(--lime);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.loyalty {
+  background-color: var(--forest-green);
+  color: var(--lime);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.affiliated-companies {
+  background-color: var(--earth);
+  color: var(--lime);
+  padding: 20px;
+  border-radius: 10px;
+}
