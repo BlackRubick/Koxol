@@ -1,0 +1,63 @@
+.membership-card.selected {
+  border-color: #2D5016 !important;
+  box-shadow: 0 0 0 2.5px #2D5016, 0 8px 32px 0 rgba(45,80,22,0.13);
+  transform: scale(1.05);
+}
+/* Card de membresía premium */
+.membership-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 24px 0 rgba(45,80,22,0.10);
+  padding: 2.2em 1.3em 1.7em 1.3em;
+  text-align: center;
+  max-width: 280px;
+  margin: 0 0.7em;
+  border: 2.5px solid transparent;
+  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+  animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+}
+.membership-card.featured {
+  border-color: var(--color-accent);
+  box-shadow: 0 8px 32px 0 rgba(212,165,116,0.16);
+  transform: scale(1.04);
+}
+.membership-card__name {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0.7em 0 0.3em 0;
+}
+.membership-card__price {
+  margin-bottom: 1.2em;
+}
+.membership-card__amount {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+.membership-card__period {
+  font-size: 1rem;
+  color: var(--color-text-light);
+  font-weight: 500;
+  margin-left: 0.3em;
+}
+.membership-card__benefits {
+  list-style: none;
+  padding: 0;
+  margin: 1.2em 0 1.7em 0;
+  color: var(--color-text-light);
+  font-size: 1.01rem;
+  text-align: left;
+}
+.membership-card__benefits li {
+  margin-bottom: 0.7em;
+  position: relative;
+  padding-left: 1.2em;
+}
+.membership-card__benefits li::before {
+  content: '✓';
+  color: var(--color-secondary);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}

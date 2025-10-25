@@ -1,0 +1,108 @@
+/* Sección de Fidelización / Lealtad K'oxol */
+.koxol-loyalty {
+  width: 100%;
+  background: var(--color-bg-alt);
+  padding: 5em 0 3em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.koxol-loyalty__title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 1.2em;
+  text-align: center;
+  letter-spacing: -0.01em;
+  animation: fadeInUp 1.1s cubic-bezier(.4,0,.2,1);
+}
+.koxol-loyalty__title span {
+  color: var(--color-accent);
+}
+.koxol-loyalty__desc {
+  font-size: 1.08rem;
+  color: var(--color-text-light);
+  margin-bottom: 2.2em;
+  text-align: center;
+  max-width: 600px;
+}
+.koxol-loyalty__benefits {
+  display: flex;
+  gap: 2.5em;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2.5em;
+}
+.loyalty-benefit {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 18px 0 rgba(45,80,22,0.10);
+  padding: 2em 1.2em 1.5em 1.2em;
+  text-align: center;
+  max-width: 260px;
+  min-width: 200px;
+  margin: 0 0.7em;
+  transition: box-shadow var(--transition), transform var(--transition);
+  animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.loyalty-benefit__icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.7em;
+  color: var(--color-accent);
+}
+.loyalty-benefit h3 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin: 0.5em 0 0.2em 0;
+  color: var(--color-primary);
+}
+.loyalty-benefit p {
+  font-size: 1rem;
+  color: var(--color-text-light);
+}
+.koxol-loyalty__cta {
+  display: flex;
+  gap: 1.2em;
+  margin-top: 1.5em;
+  justify-content: center;
+}
+.loyalty__button {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: 1.2em;
+  padding: 0.7em 2em;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition), transform var(--transition);
+}
+.loyalty__button:hover {
+  background: var(--color-primary);
+  color: #fff;
+  transform: scale(1.05);
+}
+@media (max-width: 900px) {
+  .koxol-loyalty__benefits {
+    gap: 1.3em;
+  }
+}
+@media (max-width: 600px) {
+  .koxol-loyalty {
+    padding: 2.5em 0 1.2em 0;
+  }
+  .koxol-loyalty__benefits {
+    flex-direction: column;
+    gap: 1.5em;
+    align-items: center;
+  }
+  .loyalty-benefit {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 1.2em 0.7em 1em 0.7em;
+  }
+}

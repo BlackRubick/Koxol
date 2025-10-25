@@ -1,0 +1,28 @@
+/* Testimonios: cards flotantes y carrusel */
+.koxol-testimonials {
+  width: 100%;
+  background: linear-gradient(120deg, var(--color-bg-alt) 60%, var(--color-bg) 100%);
+  padding: 5em 0 2.5em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.koxol-testimonials__title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 1.7em;
+  letter-spacing: -0.01em;
+  text-align: center;
+  animation: fadeInUp 1.1s cubic-bezier(.4,0,.2,1);
+}
+@media (max-width: 600px) {
+  .koxol-testimonials {
+    padding: 2.5em 0 1.2em 0;
+  }
+  .testimonial-card {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 1.2em 0.7em 1em 0.7em;
+  }
+}

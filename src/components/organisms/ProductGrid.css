@@ -1,0 +1,23 @@
+/* --- GRID TIPO MARKETPLACE --- */
+.koxol-product-grid {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 1.5em 0.5em 1.5em 0.5em;
+}
+.koxol-product-grid__title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #176c3a;
+  margin-bottom: 1.1em;
+  text-align: left;
+  letter-spacing: 0.01em;
+  margin-left: 0.2em;
+}
+.koxol-product-grid__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5em 1.1em;
+  width: 100%;
+  align-items: stretch;
+}

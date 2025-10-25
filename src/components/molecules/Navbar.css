@@ -1,0 +1,455 @@
+/* Importando fuente Pacifico de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+/* Navbar sticky premium con glassmorphism y animaciones suaves */
+.koxol-navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(161, 136, 127, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: navbarSlideDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.koxol-navbar.scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(30px) saturate(200%);
+  border-bottom: 1px solid rgba(161, 136, 127, 0.2);
+  box-shadow: 0 4px 24px rgba(62, 39, 35, 0.08);
+}
+
+@keyframes navbarSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Container */
+.koxol-navbar__container {
+  /*max-width: 1400px;*/
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.koxol-navbar__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 75px;
+  gap: 3rem;
+  padding: 0 1rem; /* Añade padding interno */
+}
+
+.koxol-navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  margin-right: auto; /* Empuja el logo más a la izquierda */
+}
+
+.koxol-navbar__logo {
+  height: 55px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.koxol-navbar__logo:hover {
+  transform: scale(1.05);
+}
+
+.koxol-navbar__badge {
+  position: absolute;
+  bottom: -8px;
+  right: -45px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #558B2F;
+  background: rgba(139, 195, 74, 0.15);
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 195, 74, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+/* Links Desktop */
+.koxol-navbar__links {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.koxol-navbar__links--desktop {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.koxol-navbar__link {
+  position: relative;
+  color: #3E2723;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.koxol-navbar__link::before {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #558B2F, #7CB342);
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
+}
+
+.koxol-navbar__link:hover {
+  color: #558B2F;
+  background: rgba(139, 195, 74, 0.08);
+}
+
+.koxol-navbar__link:hover::before {
+  width: 70%;
+}
+
+/* Actions Desktop */
+.koxol-navbar__actions {
+  display: none;
+}
+
+.koxol-navbar__actions--desktop {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto; /* Empuja el carrito más a la derecha */
+}
+.koxol-navbar__cart {
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.koxol-navbar__cart:hover {
+  background: rgba(139, 195, 74, 0.1);
+  transform: scale(1.1);
+}
+
+/* Burger Menu */
+.koxol-navbar__burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+
+.burger-bar {
+  display: block;
+  width: 26px;
+  height: 3px;
+  background: #3E2723;
+  border-radius: 3px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.burger-bar::before,
+.burger-bar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 26px;
+  height: 3px;
+  background: #3E2723;
+  border-radius: 3px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.burger-bar::before {
+  top: -8px;
+}
+
+.burger-bar::after {
+  top: 8px;
+}
+
+.burger-bar.open {
+  background: transparent;
+}
+
+.burger-bar.open::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.burger-bar.open::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+/* Mobile Menu */
+.koxol-navbar__mobile-menu {
+  display: none;
+}
+
+.koxol-navbar__overlay {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .koxol-navbar__link {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.8rem;
+  }
+  
+  .koxol-navbar__content {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .koxol-navbar__links--desktop {
+    display: none;
+  }
+  
+  .koxol-navbar__actions--desktop {
+    display: none;
+  }
+  
+  .koxol-navbar__burger {
+    display: block;
+  }
+  
+  .koxol-navbar__badge {
+    display: none;
+  }
+  
+  /* Mobile Menu Visible */
+  .koxol-navbar__mobile-menu {
+    display: block;
+    position: fixed;
+    top: 75px;
+    left: 0;
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(161, 136, 127, 0.1);
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .koxol-navbar__mobile-menu.open {
+    max-height: calc(100vh - 75px);
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(62, 39, 35, 0.12);
+  }
+  
+  .koxol-navbar__mobile-links {
+    list-style: none;
+    margin: 0;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .koxol-navbar__mobile-link {
+    color: #3E2723;
+    font-weight: 500;
+    font-size: 1rem;
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: block;
+    text-align: center;
+  }
+  
+  .koxol-navbar__mobile-link:hover,
+  .koxol-navbar__mobile-link:active {
+    background: rgba(139, 195, 74, 0.12);
+    color: #558B2F;
+    transform: translateX(5px);
+  }
+  
+  .koxol-navbar__mobile-actions {
+    padding: 1rem 2rem 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid rgba(161, 136, 127, 0.1);
+  }
+  
+  .koxol-navbar__mobile-actions .koxol-btn {
+    min-width: 200px;
+  }
+  
+  /* Overlay */
+  .koxol-navbar__overlay {
+    display: block;
+    position: fixed;
+    top: 75px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 75px);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .koxol-navbar__container {
+    padding: 0 1rem;
+  }
+  
+  .koxol-navbar__content {
+    height: 65px;
+  }
+  
+  .koxol-navbar__logo {
+    height: 45px;
+  }
+  
+  .koxol-navbar__mobile-menu {
+    top: 65px;
+  }
+  
+  .koxol-navbar__mobile-menu.open {
+    max-height: calc(100vh - 65px);
+  }
+  
+  .koxol-navbar__overlay {
+    top: 65px;
+    height: calc(100vh - 65px);
+  }
+  
+  .koxol-navbar__mobile-links {
+    padding: 1rem 1rem;
+  }
+  
+  .koxol-navbar__mobile-link {
+    font-size: 0.95rem;
+    padding: 0.9rem 1rem;
+  }
+  
+  .koxol-navbar__mobile-actions {
+    padding: 1rem 1rem 1.5rem;
+  }
+  
+  .koxol-navbar__mobile-actions .koxol-btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* Estilo para el texto 'K'oxol' */
+.koxol-navbar__text-logo {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #558B2F; /* Verde principal */
+  background: linear-gradient(90deg, #558B2F, #7CB342);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: spin 10s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(360deg);
+  }
+}
+
+/* Estilos para el ícono de perfil y menú desplegable */
+.koxol-navbar__profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.koxol-navbar__profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1000;
+}
+
+.koxol-navbar__profile:hover .koxol-navbar__profile-dropdown {
+  display: flex;
+}
+
+.koxol-navbar__profile-dropdown button {
+  background: #558B2F;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.koxol-navbar__profile-dropdown button:hover {
+  background: #33691E;
+}

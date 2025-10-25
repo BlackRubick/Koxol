@@ -1,0 +1,37 @@
+/* Card interactiva para asociado */
+.associate-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 24px 0 rgba(45,80,22,0.10);
+  padding: 2.2em 1.3em 1.7em 1.3em;
+  text-align: center;
+  max-width: 260px;
+  margin: 0 0.7em;
+  transition: box-shadow var(--transition), transform var(--transition), background var(--transition);
+  cursor: pointer;
+  animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+}
+.associate-card:hover {
+  background: var(--color-secondary);
+  color: #fff;
+  box-shadow: 0 8px 32px 0 rgba(45,80,22,0.16);
+  transform: translateY(-6px) scale(1.04) rotate(-2deg);
+}
+.associate-card__icon {
+  font-size: 2.5rem;
+  margin-bottom: 1em;
+  color: var(--color-accent);
+  transition: color var(--transition);
+}
+.associate-card:hover .associate-card__icon {
+  color: #fff;
+}
+.associate-card__title {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin: 0.7em 0 0.3em 0;
+}
+.associate-card__desc {
+  font-size: 1.01rem;
+  margin: 0 0 1.1em 0;
+}

@@ -1,0 +1,46 @@
+/* Toggle mensual/anual animado */
+.billing-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  background: rgba(255,255,255,0.8);
+  border-radius: 2em;
+  padding: 0.3em 1em;
+  box-shadow: 0 2px 12px 0 rgba(45,80,22,0.10);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 2em;
+  width: fit-content;
+  transition: background var(--transition);
+}
+.billing-toggle span {
+  color: var(--color-text-light);
+  transition: color var(--transition);
+}
+.billing-toggle span.active {
+  color: var(--color-primary);
+}
+.toggle-switch {
+  width: 38px;
+  height: 22px;
+  background: var(--color-bg-alt);
+  border-radius: 1em;
+  position: relative;
+  transition: background var(--transition);
+}
+.toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  transition: left var(--transition);
+}
+.toggle-switch.yearly::before {
+  left: 18px;
+}

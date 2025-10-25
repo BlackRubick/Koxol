@@ -1,0 +1,192 @@
+/* Enhanced styles for Welcome Section with logo */
+.welcome-section {
+  padding: 3em;
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-background-light));
+  text-align: center;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 1.5s ease-in-out;
+  position: relative; /* Ensure proper positioning context */
+  overflow: hidden; /* Prevent emojis from escaping the section */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ensure it takes full viewport height */
+  margin: 0 auto; /* Center the section horizontally */
+}
+
+/* Ensure Welcome Section maintains its size and position */
+.welcome-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Ensure proper stacking context */
+  min-height: 100vh; /* Ensure it takes full viewport height */
+  margin: 0 auto; /* Center the section horizontally */
+  overflow: hidden; /* Prevent content overflow */
+}
+
+.welcome-section__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5em;
+}
+.welcome-section__logo {
+  width: 150px; /* Increased size */
+  height: auto;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: float 3s ease-in-out infinite;
+}
+.welcome-section__title {
+  font-size: 2.5rem;
+  color: var(--color-primary-dark);
+  margin-bottom: 1em;
+  animation: slideIn 1s ease-in-out;
+}
+.welcome-section__intro {
+  font-size: 1.3rem;
+  color: var(--color-text-dark);
+  margin-bottom: 2em;
+  animation: fadeIn 1.5s ease-in-out;
+}
+.welcome-section__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2em 0;
+  animation: fadeIn 1.5s ease-in-out;
+}
+.welcome-section__list li {
+  font-size: 1.1rem;
+  color: var(--color-text-light);
+  margin-bottom: 0.8em;
+}
+.welcome-section__promise {
+  font-size: 1.2rem;
+  color: var(--color-text-dark);
+  margin-bottom: 2em;
+  animation: fadeIn 1.5s ease-in-out;
+}
+.welcome-section__buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5em;
+  animation: fadeIn 1.5s ease-in-out;
+}
+.welcome-section__button {
+  background: var(--color-primary);
+  color: #fff;
+  padding: 1em 2em;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+.welcome-section__button:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.1);
+}
+
+/* Updated floating emojis with random effects */
+.auth-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+.floating-leaf {
+  position: absolute;
+  font-size: 2rem;
+  animation: rain-effect 5s linear infinite;
+  opacity: 1 !important; /* Override any opacity changes */
+}
+
+@keyframes rain-effect {
+  0% {
+    transform: translateY(-10%);
+  }
+  100% {
+    transform: translateY(110%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes rain-once {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(50vh) rotate(180deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Add smooth floating effects to emojis */
+.floating-leaf {
+  position: absolute;
+  font-size: 2rem;
+  animation: float-effect 5s ease-in-out infinite, spin-effect 3s linear infinite;
+}
+
+@keyframes float-effect {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes spin-effect {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

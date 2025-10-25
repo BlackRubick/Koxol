@@ -1,0 +1,18 @@
+/* Átomo: Icono de carrito de compras */
+.cart-icon {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+.cart-icon__badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #176c3a;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0.4em 0.6em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

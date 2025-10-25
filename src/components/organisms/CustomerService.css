@@ -1,0 +1,155 @@
+/* Sección de Servicio al Cliente K'oxol */
+.koxol-customer-service {
+  width: 100%;
+  background: var(--color-bg);
+  padding: 5em 0 3em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.koxol-customer-service__title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 1.2em;
+  text-align: center;
+  letter-spacing: -0.01em;
+  animation: fadeInUp 1.1s cubic-bezier(.4,0,.2,1);
+}
+.koxol-customer-service__title span {
+  color: var(--color-accent);
+}
+.koxol-customer-service__desc {
+  font-size: 1.08rem;
+  color: var(--color-text-light);
+  margin-bottom: 2.2em;
+  text-align: center;
+  max-width: 600px;
+}
+.koxol-customer-service__channels {
+  display: flex;
+  gap: 2.5em;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2.5em;
+}
+.customer-channel {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 18px 0 rgba(45,80,22,0.10);
+  padding: 2em 1.2em 1.5em 1.2em;
+  text-align: center;
+  max-width: 260px;
+  min-width: 200px;
+  margin: 0 0.7em;
+  transition: box-shadow var(--transition), transform var(--transition);
+  animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.customer-channel__icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.7em;
+}
+.customer-channel__icon.whatsapp {
+  color: #25d366;
+}
+.customer-channel__icon.email {
+  color: #0072c6;
+}
+.customer-channel__icon.faq {
+  color: var(--color-accent);
+}
+.customer-channel h3 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin: 0.5em 0 0.2em 0;
+  color: var(--color-primary);
+}
+.customer-channel p {
+  font-size: 1rem;
+  color: var(--color-text-light);
+}
+.customer-channel a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.customer-channel a:hover {
+  color: var(--color-primary);
+}
+.koxol-customer-service__cta {
+  display: flex;
+  gap: 1.2em;
+  margin-top: 1.5em;
+  justify-content: center;
+}
+.customer-service__button {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: 1.2em;
+  padding: 0.7em 2em;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition), transform var(--transition);
+}
+.customer-service__button.alt {
+  background: var(--color-primary);
+}
+.customer-service__button:hover {
+  background: var(--color-primary);
+  color: #fff;
+  transform: scale(1.05);
+}
+.koxol-customer-service__contact-info {
+  margin: 2em 0 1.5em 0;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 12px 0 rgba(45,80,22,0.07);
+  padding: 1.2em 2em;
+  max-width: 420px;
+  width: 100%;
+  text-align: left;
+  font-size: 1.05rem;
+  color: var(--color-text-light);
+}
+.koxol-customer-service__contact-info p {
+  margin: 0.3em 0;
+  color: var(--color-text-light);
+}
+.koxol-customer-service__contact-info a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.koxol-customer-service__contact-info a:hover {
+  color: var(--color-primary);
+}
+@media (max-width: 900px) {
+  .koxol-customer-service__channels {
+    gap: 1.3em;
+  }
+}
+@media (max-width: 600px) {
+  .koxol-customer-service {
+    padding: 2.5em 0 1.2em 0;
+  }
+  .koxol-customer-service__channels {
+    flex-direction: column;
+    gap: 1.5em;
+    align-items: center;
+  }
+  .customer-channel {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 1.2em 0.7em 1em 0.7em;
+  }
+  .koxol-customer-service__contact-info {
+    padding: 1.2em 0.7em 1em 0.7em;
+    max-width: 98vw;
+  }
+}

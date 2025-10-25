@@ -1,0 +1,51 @@
+/* Card flotante de testimonio */
+.testimonial-card {
+  background: rgba(255,255,255,0.98);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px 0 rgba(45,80,22,0.13);
+  padding: 2.2em 1.3em 1.7em 1.3em;
+  text-align: center;
+  max-width: 260px;
+  margin: 0 auto; /* Center horizontally */
+  position: relative;
+  top: 0;
+  transition: box-shadow var(--transition), transform var(--transition), top var(--transition);
+  animation: floatCard 2.5s ease-in-out infinite alternate, fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Ensure vertical alignment */
+}
+.testimonial-card__photo {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 1em;
+  box-shadow: 0 2px 12px 0 rgba(45,80,22,0.10);
+}
+.testimonial-card__stars {
+  margin-bottom: 0.7em;
+}
+.star {
+  color: #D4A574;
+  font-size: 1.1em;
+  opacity: 0.5;
+}
+.star.filled {
+  opacity: 1;
+}
+.testimonial-card__text {
+  color: var(--color-text-light);
+  font-size: 1.01rem;
+  margin: 0 0 1.1em 0;
+  font-style: italic;
+}
+.testimonial-card__name {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1.08rem;
+}
+@keyframes floatCard {
+  0% { top: 0; }
+  100% { top: -12px; }
+}

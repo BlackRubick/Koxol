@@ -1,0 +1,17 @@
+/* Logo K'oxol estilo premium */
+.koxol-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 50%;
+  box-shadow: 0 2px 12px 0 rgba(45,80,22,0.10);
+  backdrop-filter: var(--glass-blur);
+  transition: box-shadow var(--transition), background var(--transition);
+}
+.koxol-logo:hover {
+  box-shadow: 0 4px 24px 0 rgba(45,80,22,0.18);
+  background: rgba(255,255,255,0.9);
+}

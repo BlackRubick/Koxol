@@ -1,0 +1,187 @@
+/* Card visual para producto */
+/* --- PRODUCT CARD TIPO MERCADO LIBRE, COLORES KOXOL --- */
+.product-card {
+  background: #fff;
+  border-radius: 1.1em;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
+  padding: 1.2em 1.1em 1.3em 1.1em;
+  text-align: left;
+  max-width: 270px;
+  min-width: 220px;
+  min-height: 390px;
+  height: 390px;
+  margin: 0 0.7em 2em 0.7em;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  transition: box-shadow 0.18s, transform 0.18s;
+  animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+  border: 1px solid #ececec;
+}
+.product-card:hover {
+  box-shadow: 0 16px 48px 0 rgba(45,80,22,0.19);
+  transform: translateY(-10px) scale(1.055);
+  border-color: #d1fae5;
+}
+.product-card__img-wrap {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1em;
+}
+.product-card__img {
+  width: 100%;
+  max-width: 170px;
+  height: 150px;
+  object-fit: contain;
+  border-radius: 1em;
+  margin: 0 auto;
+  box-shadow: 0 2px 10px 0 rgba(45,80,22,0.08);
+  background: #f8f8f8;
+  display: block;
+  border: 1px solid #f0f0f0;
+}
+.product-card__discount {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #169c7c;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 0.7em;
+  box-shadow: 0 2px 8px 0 rgba(22,156,124,0.13);
+  letter-spacing: 0.01em;
+  z-index: 2;
+}
+.product-card__info {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 0.7em;
+}
+.product-card__name {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 0.3em 0;
+  min-height: 2.1em;
+  line-height: 1.18;
+  letter-spacing: 0.01em;
+  text-align: left;
+}
+.product-card__rating {
+  font-size: 0.98rem;
+  color: #176c3a;
+  margin-bottom: 0.2em;
+  font-weight: 600;
+}
+.product-card__stars {
+  color: #169c7c;
+  font-weight: 700;
+}
+.product-card__sales {
+  color: #999;
+  font-weight: 500;
+  margin-left: 0.2em;
+}
+.product-card__original-price {
+  font-size: 1.01rem;
+  color: #bdbdbd;
+  text-decoration: line-through;
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+.product-card__price-row {
+  margin-bottom: 0.3em;
+}
+.product-card__price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #176c3a;
+  letter-spacing: 0.01em;
+}
+.product-card__shipping {
+  font-size: 0.98rem;
+  color: #169c7c;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.5em;
+}
+.product-card__desc {
+  color: #555;
+  font-size: 0.98rem;
+  margin: 0 0 0.7em 0;
+  min-height: 2.2em;
+  max-height: 3.2em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* Añadido para compatibilidad estándar */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.92;
+  line-height: 1.28;
+}
+.product-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  width: 100%;
+  margin-top: auto;
+  align-items: stretch;
+  padding-top: 1em; /* Ajuste para evitar que el botón se desborde */
+}
+.product-card__actions button,
+.product-card__actions .koxol-btn {
+  width: 100%;
+  min-width: 0;
+  font-size: 1.04rem;
+  padding: 0.7em 0;
+  border-radius: 1.1em;
+  font-weight: 700;
+  box-shadow: 0 1px 6px 0 rgba(45,80,22,0.07);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+.product-card__actions button,
+.product-card__actions .koxol-btn {
+  width: 100%;
+  min-width: 0;
+  font-size: 1.04rem;
+  padding: 0.7em 0;
+  border-radius: 1.3em;
+  font-weight: 700;
+  box-shadow: 0 2px 10px 0 rgba(45,80,22,0.09);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+.product-card__actions .koxol-btn--primary {
+  background: linear-gradient(90deg,#169c7c 0%, #2D5016 100%);
+  color: #fff;
+  border: none;
+  font-weight: 800;
+}
+.product-card__actions .koxol-btn--secondary {
+  background: #e6e6e6;
+  color: #169c7c;
+  border: none;
+  font-weight: 700;
+}
+.product-card__actions button:hover,
+.product-card__actions .koxol-btn--primary:hover {
+  background: linear-gradient(90deg,#2D5016 0%, #169c7c 100%);
+  color: #fff;
+  box-shadow: 0 4px 18px 0 rgba(45,80,22,0.16);
+}
+.product-card__actions .koxol-btn--secondary:hover {
+  background: #d1fae5;
+  color: #166534;
+}

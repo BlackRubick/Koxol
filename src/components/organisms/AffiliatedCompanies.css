@@ -1,0 +1,61 @@
+.affiliated-companies {
+  padding: 2rem;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.affiliated-companies h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.companies-list {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.company-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 150px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Mantiene el tamaño del div */
+  align-items: center;
+  height: 200px; /* Fija el tamaño del div */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: float 3s ease-in-out infinite;
+}
+
+.company-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.company-logo {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 0.5rem;
+  margin-top: 20px; /* Mueve la imagen más abajo sin afectar el tamaño del div */
+}
+
+.company-name {
+  font-size: 1rem;
+  color: #555;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
