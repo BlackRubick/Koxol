@@ -8,35 +8,34 @@ const miembros = [
   {
     nombre: 'Duki',
     foto: '/diku.jpg',
-    comentario: 'El spray K’oxol me salvó en el último festival, ¡ni un mosquito se me acercó!',
-    producto: 'Spray Repelente',
+    comentario: 'El spray K\'oxol de 250ml me salvó en el último festival, ¡ni un mosquito se me acercó! Protección de 8 horas garantizada.',
+    producto: 'Spray Repelente 250ml',
   },
   {
     nombre: 'Luis Miguel',
     foto: '/luismiguel.jpeg',
-    comentario: 'La crema K’oxol es perfecta para la piel sensible, la uso antes de cada show.',
-    producto: 'Crema Repelente',
+    comentario: 'La crema K\'oxol de 180ml es perfecta para la piel sensible, hidrata y protege. La uso antes de cada show.',
+    producto: 'Crema Repelente 180ml',
   },
   {
     nombre: 'Maluma',
     foto: '/maluma.jpg',
-    comentario: 'El roll-on K’oxol es mi secreto para viajar sin picaduras, ¡lo recomiendo!',
-    producto: 'Roll-on Repelente',
+    comentario: 'La loción K\'oxol de 300ml es mi secreto para viajar sin picaduras. Textura ligera y muy efectiva.',
+    producto: 'Loción Antimosquitos 300ml',
   },
   {
     nombre: 'Raw',
     foto: '/raw.jpeg',
-    comentario: 'Las toallitas K’oxol son súper prácticas para el backstage y giras.',
-    producto: 'Toallitas Repelentes',
+    comentario: 'Las pulseras K\'oxol son súper prácticas para el backstage y giras. Liberación aromática prolongada todo el día.',
+    producto: 'Pulseras Repelentes',
   },
   {
     nombre: 'Ricky',
     foto: '/ricky.jpg',
-    comentario: 'El gel K’oxol me acompaña en cada aventura al aire libre, ¡funciona genial!',
-    producto: 'Gel Repelente',
+    comentario: 'Las velas K\'oxol me acompañan en cada cena al aire libre. Ambiente agradable y sin mosquitos.',
+    producto: 'Velas de Citronela',
   },
 ];
-
 
 function FamiliaKoxol() {
   const [flipped, setFlipped] = useState(Array(miembros.length).fill(false));
@@ -56,7 +55,6 @@ function FamiliaKoxol() {
     return () => clearInterval(interval);
   }, []);
 
-  // Al tocar la card en móvil, mostrar reverso manualmente
   const handleCardClick = idx => {
     if (!isMobile()) return;
     setFlipped(prev => prev.map((v, i) => i === idx ? !v : v));
@@ -65,38 +63,71 @@ function FamiliaKoxol() {
 
   return (
     <section className="familia-koxol-section">
-      <h2 className="familia-title">Familia K'oxol</h2>
+      <div className="familia-koxol-background">
+        <div className="familia-shape familia-shape--1"></div>
+        <div className="familia-shape familia-shape--2"></div>
+        <div className="familia-shape familia-shape--3"></div>
+      </div>
+
+      <div className="familia-header">
+        <div className="familia-badge">
+          <span className="familia-badge__icon">👥</span>
+          <span className="familia-badge__text">Embajadores K'oxol</span>
+        </div>
+        <h2 className="familia-title">
+          Familia <span className="familia-title-highlight">K'oxol</span>
+        </h2>
+
+      </div>
+
       <div className="familia-list">
         {miembros.map((m, i) => (
           <div
             className={`familia-card-flip${flipped[i] ? ' flipped' : ''}`}
             key={m.nombre}
             onClick={() => handleCardClick(i)}
+            style={{ animationDelay: `${i * 0.1}s` }}
           >
             <div className="familia-card-inner">
               <div className="familia-card-front">
+                <div className="familia-card-glow"></div>
                 {m.modelo3D ? (
                   <div style={{ width: '100%', height: '200px' }}>
                     <ThreeDModelViewer />
                   </div>
                 ) : (
-                  <img src={m.foto} alt={m.nombre} className="familia-img" />
+                  <div className="familia-img-wrapper">
+                    <img src={m.foto} alt={m.nombre} className="familia-img" />
+                    <div className="img-overlay"></div>
+                  </div>
                 )}
                 <div className="familia-info">
-                  <h3>{m.nombre}</h3>
-                  <p className="familia-comentario">{m.producto}</p>
+                  <h3 className="familia-nombre">{m.nombre}</h3>
+                  <div className="familia-producto-badge">
+                    <span className="producto-text">{m.producto}</span>
+                  </div>
+                </div>
+                <div className="flip-hint">
+                  <span className="flip-hint-icon">↻</span>
+                  <span className="flip-hint-text">Toca para ver más</span>
                 </div>
               </div>
               <div className="familia-card-back">
                 <div className="familia-back-content">
-                  <h3>{m.nombre}</h3>
+                  <div className="back-quote-icon">"</div>
+                  <h3 className="back-nombre">{m.nombre}</h3>
                   <p className="familia-comentario">{m.comentario}</p>
+                  <div className="back-producto">
+                    {m.producto}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+
     </section>
   );
 }

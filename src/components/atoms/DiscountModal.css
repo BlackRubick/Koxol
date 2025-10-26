@@ -129,7 +129,7 @@
   .discount-modal p { font-size: 1rem; }
 }
 .discount-modal .register-btn {
-  background: linear-gradient(90deg, var(--color-primary, #2D5016) 60%, var(--color-accent, #D4A574) 100%);
+  background: #558B2F; /* Verde principal */
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -142,7 +142,7 @@
   margin-top: 0.2rem;
 }
 .discount-modal .register-btn:hover {
-  background: linear-gradient(90deg, var(--color-accent, #D4A574) 0%, var(--color-primary, #2D5016) 100%);
+  background: #33691E; /* Verde oscuro para hover */
   transform: translateY(-2px) scale(1.04);
 }
 .discount-modal .close-btn {
@@ -155,7 +155,15 @@
   color: var(--color-text-light, #6C757D);
   cursor: pointer;
   transition: color 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 .discount-modal .close-btn:hover {
   color: var(--color-primary, #2D5016);
+  background: rgba(45,80,22,0.1);
 }

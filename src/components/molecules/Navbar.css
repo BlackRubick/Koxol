@@ -453,3 +453,21 @@
 .koxol-navbar__profile-dropdown button:hover {
   background: #33691E;
 }
+
+/* Botón 'Compra ahora' */
+.koxol-navbar__button {
+  background: #558B2F !important; /* Verde principal */
+  color: #fff !important;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.koxol-navbar__button:hover {
+  background: #33691E !important; /* Verde oscuro para hover */
+  transform: scale(1.05);
+}

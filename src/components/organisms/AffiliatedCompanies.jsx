@@ -3,7 +3,7 @@ import './AffiliatedCompanies.css';
 
 const AffiliatedCompanies = () => {
   const companies = [
-    { name: 'Walmart', logo: '/Walmart.png', style: { marginTop: '50px' } },
+    { name: 'Walmart', logo: 'public/Walmart.png', style: { marginTop: '50px' } },
     { name: 'HEB', logo: '/heb.png' },
     { name: 'Chedraui', logo: '/chedraui.jpeg' },
   ];
@@ -15,14 +15,10 @@ const AffiliatedCompanies = () => {
         {companies.map((company, index) => (
           <div key={index} className="company-card">
             <img 
-              src={company.logo} 
+              src={index === 0 ? '/WalmartLogo.png' : index === 1 ? '/HEBLogo.png' : company.logo} 
               alt={`${company.name} logo`} 
               className="company-logo" 
               style={company.style || {}} 
-              onError={(e) => {
-                e.target.src = '/placeholder.png';
-                e.target.alt = 'Imagen no disponible';
-              }}
             />
           </div>
         ))}

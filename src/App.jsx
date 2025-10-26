@@ -27,6 +27,7 @@ import WelcomeSection from './components/organisms/WelcomeSection';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import AffiliatedCompanies from './components/organisms/AffiliatedCompanies';
+import NaturalSection from './components/organisms/NaturalSection';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -128,6 +129,11 @@ function App() {
         animation={{ initial: { opacity: 0, y: 50 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } }}
       >
         <WelcomeSection />
+      </AnimatedSection>
+      <AnimatedSection
+        animation={{ initial: { opacity: 0, y: 50 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } }}
+      >
+        <NaturalSection />
       </AnimatedSection>
       <AnimatedSection
         animation={{ initial: { opacity: 0, x: -50 }, animate: { opacity: 1, x: 0 }, transition: { duration: 0.7 } }}

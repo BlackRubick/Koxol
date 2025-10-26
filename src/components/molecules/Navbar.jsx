@@ -94,6 +94,11 @@ const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
             )}
           </div>
 
+          {/* Botón "Compra ahora" */}
+          <div className="koxol-navbar__actions">
+            <button className="koxol-navbar__button" onClick={() => navigate('/auth')}>Compra ahora</button>
+          </div>
+
           {/* Burger Menu */}
           <button 
             className="koxol-navbar__burger" 

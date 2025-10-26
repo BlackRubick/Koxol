@@ -1,22 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './CookieBanner.css';
 
-const COOKIE_KEY = 'koxol_cookie_consent';
-
 export default function CookieBanner() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const consent = localStorage.getItem(COOKIE_KEY);
-    if (!consent) setVisible(true);
-  }, []);
+  const [visible, setVisible] = useState(true);
 
   const handleAccept = () => {
-    localStorage.setItem(COOKIE_KEY, 'accepted');
     setVisible(false);
   };
   const handleReject = () => {
-    localStorage.setItem(COOKIE_KEY, 'rejected');
     setVisible(false);
   };
 

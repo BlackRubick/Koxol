@@ -1,10 +1,69 @@
-/* Sección de Beneficios Clave, responsive y premium */
+/* Sección de Beneficios Clave - Diseño Premium */
 .koxol-benefits {
   width: 100%;
-  background: linear-gradient(120deg, #EFEBE9 60%, #F1F8E9 100%);
-  padding: 5.5em 0 4em 0;
+  background: linear-gradient(135deg, #EFEBE9 0%, #F1F8E9 50%, #E8F5E9 100%);
+  padding: 6rem 2rem;
   border: none !important;
   box-shadow: none !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.koxol-benefits__background-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.08;
+  animation: float 20s ease-in-out infinite;
+}
+
+.shape-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #8BC34A, transparent);
+  top: -10%;
+  right: -5%;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #A1887F, transparent);
+  bottom: -5%;
+  left: -5%;
+  animation-delay: 5s;
+}
+
+.shape-3 {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, #66BB6A, transparent);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 10s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
 }
 
 .koxol-benefits__wrapper {
@@ -12,60 +71,221 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.koxol-benefits__header {
+  text-align: center;
+  margin-bottom: 4.5rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.koxol-benefits__header-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  animation: bounce 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .koxol-benefits__title {
-  text-align: center;
-  margin-bottom: 3rem;
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #333;
+  font-size: 3rem;
+  font-weight: 800;
+  color: #3E2723;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.koxol-benefits__subtitle {
+  font-size: 1.3rem;
+  color: #5D4037;
+  font-weight: 400;
+  opacity: 0.9;
 }
 
 .koxol-benefits__container {
   display: flex;
-  gap: 2.5em;
-  max-width: 1100px;
+  gap: 2.5rem;
+  max-width: 100%;
   margin: 0 auto;
   flex-wrap: wrap;
   justify-content: center;
+  padding: 0 1rem;
   border: none !important;
   box-shadow: none !important;
 }
 
-@media (max-width: 900px) {
-  .koxol-benefits__container {
-    gap: 1.3em;
+.koxol-benefits__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 4rem;
+  padding: 1.5rem 3rem;
+  background: linear-gradient(135deg, #A1887F 0%, #8D6E63 100%);
+  border-radius: 60px;
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 
+    0 8px 25px rgba(161, 136, 127, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.koxol-benefits__badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 12px 35px rgba(161, 136, 127, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+.badge-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 60px;
+  transform: translate(-50%, -50%);
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
   }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.badge-icon {
+  background: #EFEBE9;
+  color: #3E2723;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.3rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.koxol-benefits__badge p {
+  color: #EFEBE9;
+  font-weight: 600;
+  margin: 0;
+  font-size: 1.1rem;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .koxol-benefits {
+    padding: 4.5rem 1.5rem;
+  }
+  
+  .koxol-benefits__container {
+    gap: 2rem;
+  }
+  
   .koxol-benefits__title {
-    font-size: 2rem;
+    font-size: 2.4rem;
+  }
+  
+  .koxol-benefits__subtitle {
+    font-size: 1.15rem;
+  }
+  
+  .koxol-benefits__header-icon {
+    font-size: 3rem;
   }
 }
 
 @media (max-width: 600px) {
   .koxol-benefits {
-    padding: 3em 0 2em 0;
-    border: none !important;
-    box-shadow: none !important;
+    padding: 4rem 1rem;
   }
+  
+  .koxol-benefits__header {
+    margin-bottom: 3rem;
+  }
+  
+  .koxol-benefits__header-icon {
+    font-size: 2.5rem;
+  }
+  
   .koxol-benefits__title {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
+    font-size: 2rem;
   }
+  
+  .koxol-benefits__subtitle {
+    font-size: 1.05rem;
+  }
+  
   .koxol-benefits__container {
     flex-direction: column;
-    gap: 1.5em;
+    gap: 1.8rem;
     align-items: center;
-    border: none !important;
-    box-shadow: none !important;
+    padding: 0 0.5rem;
   }
-  .benefit-card {
-    min-width: 90vw;
-    max-width: 98vw;
-    padding: 1.2em 0.7em 1em 0.7em;
-    border: none !important;
-    box-shadow: none !important;
-    background: #A1887F;
-    color: #3E2723;
+  
+  .koxol-benefits__badge {
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.3rem 2rem;
+    margin-top: 3rem;
+  }
+  
+  .koxol-benefits__badge p {
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  .shape-1, .shape-2, .shape-3 {
+    width: 200px;
+    height: 200px;
   }
 }

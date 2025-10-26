@@ -4,7 +4,9 @@
   padding: 0 1rem;
   max-width: 1100px;
   text-align: center;
+  position: relative;
 }
+
 @media (max-width: 900px) {
   .familia-koxol-section {
     margin: 2rem auto 1.2rem auto;
@@ -12,6 +14,7 @@
     max-width: 98vw;
   }
 }
+
 @media (max-width: 600px) {
   .familia-koxol-section {
     margin: 1.2rem auto 0.7rem auto;
@@ -19,20 +22,69 @@
     max-width: 100vw;
   }
 }
+
+/* Header mejorado (opcional, puedes usar solo .familia-title si prefieres) */
+.familia-header {
+  margin-bottom: 2.5rem;
+}
+
+.familia-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(127, 176, 105, 0.15);
+  border-radius: 50px;
+  border: 1px solid rgba(127, 176, 105, 0.3);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary, #2D5016);
+}
+
+.familia-badge__icon {
+  font-size: 1.2rem;
+}
+
 .familia-title {
   font-size: 2.2rem;
   font-weight: 900;
   color: var(--color-primary, #2D5016);
-  margin-bottom: 2.2rem;
+  margin-bottom: 0.5rem;
   letter-spacing: -1px;
+  animation: fadeInDown 0.6s ease-out;
 }
+
+.familia-title-highlight {
+  color: var(--color-secondary, #7FB069);
+  position: relative;
+}
+
+.familia-subtitle {
+  font-size: 1rem;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .familia-list {
   display: flex;
   flex-wrap: wrap;
   gap: 2.2rem;
   justify-content: center;
 }
-/* Flip card styles */
+
+/* Flip card styles con mejoras sutiles */
 .familia-card-flip {
   perspective: 900px;
   min-width: 180px;
@@ -41,7 +93,27 @@
   height: 220px;
   margin-bottom: 0.5rem;
   cursor: pointer;
+  opacity: 0;
+  animation: fadeInScale 0.5s ease-out forwards;
 }
+
+.familia-card-flip:nth-child(1) { animation-delay: 0.1s; }
+.familia-card-flip:nth-child(2) { animation-delay: 0.2s; }
+.familia-card-flip:nth-child(3) { animation-delay: 0.3s; }
+.familia-card-flip:nth-child(4) { animation-delay: 0.4s; }
+.familia-card-flip:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 .familia-card-inner {
   position: relative;
   width: 100%;
@@ -49,11 +121,14 @@
   transition: transform 0.6s cubic-bezier(.4,0,.2,1);
   transform-style: preserve-3d;
 }
+
 .familia-card-flip:hover .familia-card-inner,
 .familia-card-flip.flipped .familia-card-inner {
   transform: rotateY(180deg);
 }
-.familia-card-front, .familia-card-back {
+
+.familia-card-front, 
+.familia-card-back {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -66,58 +141,298 @@
   justify-content: center;
   background: rgba(255,255,255,0.97);
   padding: 1.2rem 1.3rem 1.1rem 1.3rem;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
+
 .familia-card-front {
   z-index: 2;
+  border: 2px solid rgba(127, 176, 105, 0.2);
 }
+
+/* Efecto hover sutil en el frente */
+.familia-card-flip:hover .familia-card-front {
+  box-shadow: 0 8px 32px 0 rgba(45,80,22,0.15);
+  transform: translateZ(10px);
+}
+
 .familia-card-back {
   transform: rotateY(180deg);
   z-index: 3;
+  background: linear-gradient(135deg, var(--color-secondary, #7FB069) 0%, #6FA055 100%);
+  color: white;
+  border: none;
 }
+
+/* Imagen con efecto hover */
+.familia-img-wrapper {
+  position: relative;
+  margin-bottom: 0.7rem;
+}
+
 .familia-img {
   width: 90px;
   height: 90px;
   object-fit: cover;
   border-radius: 50%;
   box-shadow: 0 2px 12px 0 rgba(45,80,22,0.10);
-  margin-bottom: 0.7rem;
   border: 3px solid var(--color-secondary, #7FB069);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.familia-info h3 {
+
+.familia-card-flip:hover .familia-img {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px 0 rgba(45,80,22,0.20);
+}
+
+/* Anillo decorativo sutil */
+.familia-img-wrapper::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--color-secondary, #7FB069);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.familia-card-flip:hover .familia-img-wrapper::after {
+  opacity: 0.3;
+  animation: pulse-ring 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.1;
+  }
+}
+
+.familia-info {
+  width: 100%;
+}
+
+.familia-info h3,
+.familia-nombre {
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--color-primary, #2D5016);
-  margin: 0 0 0.3rem 0;
+  margin: 0 0 0.5rem 0;
 }
+
+/* Badge de producto */
+.familia-producto-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(127, 176, 105, 0.15);
+  border-radius: 50px;
+  border: 1px solid rgba(127, 176, 105, 0.3);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary, #2D5016);
+  margin-top: 0.3rem;
+}
+
+.producto-icon {
+  font-size: 0.9rem;
+}
+
+/* Hint de flip sutil */
+.flip-hint {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(127, 176, 105, 0.9);
+  border-radius: 15px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-size: 0.75rem;
+  color: white;
+  font-weight: 600;
+}
+
+.familia-card-flip:hover .flip-hint {
+  opacity: 1;
+}
+
+.flip-hint-icon {
+  font-size: 1rem;
+  animation: rotate-hint 2s ease-in-out infinite;
+}
+
+@keyframes rotate-hint {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+}
+
+/* Back content mejorado */
 .familia-comentario {
   font-size: 1rem;
   color: var(--color-text-light, #6C757D);
   margin: 0;
   text-align: center;
+  line-height: 1.5;
 }
+
 .familia-back-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
+  position: relative;
 }
+
+.back-quote-icon {
+  font-size: 2.5rem;
+  opacity: 0.2;
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Georgia, serif;
+}
+
+.back-nombre {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  color: white;
+}
+
+.familia-back-content .familia-comentario {
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.back-producto {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  backdrop-filter: blur(5px);
+}
+
+.back-producto-icon {
+  font-size: 0.9rem;
+}
+
+/* CTA al final */
+.familia-cta {
+  margin-top: 3rem;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.familia-cta-text {
+  font-size: 1.1rem;
+  color: var(--color-primary, #2D5016);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.familia-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--color-secondary, #7FB069) 0%, #6FA055 100%);
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 50px;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(127, 176, 105, 0.3);
+  transition: all 0.3s ease;
+}
+
+.familia-cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(127, 176, 105, 0.4);
+}
+
+.cta-arrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.familia-cta-button:hover .cta-arrow {
+  transform: translateX(4px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive móvil */
 @media (max-width: 700px) {
   .familia-list {
     gap: 1.2rem;
   }
+  
   .familia-card-flip {
     min-width: 120px;
     max-width: 140px;
     height: 180px;
   }
+  
   .familia-img {
     width: 50px;
     height: 50px;
   }
+  
   .familia-title {
-    font-size: 1.1rem;
+    font-size: 1.7rem;
   }
+
+  .familia-badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .familia-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .familia-info h3,
+  .familia-nombre {
+    font-size: 1rem;
+  }
+
+  .familia-producto-badge {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+  
   .familia-comentario {
     font-size: 0.85rem;
     line-height: 1.25;
@@ -128,13 +443,43 @@
     white-space: normal;
     text-align: center;
   }
+  
   .familia-back-content {
     min-height: 80px;
     justify-content: flex-start;
     width: 100%;
     box-sizing: border-box;
   }
+  
   .familia-card-back {
-    padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+    padding: 0.7rem 0.5rem 0.7rem 0.5rem;
+  }
+
+  .back-quote-icon {
+    font-size: 2rem;
+    top: 0.3rem;
+  }
+
+  .back-nombre {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .back-producto {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .flip-hint {
+    display: none; /* Ocultar en móvil para no saturar */
+  }
+
+  .familia-cta-text {
+    font-size: 1rem;
+  }
+
+  .familia-cta-button {
+    padding: 0.9rem 1.8rem;
+    font-size: 0.95rem;
   }
 }

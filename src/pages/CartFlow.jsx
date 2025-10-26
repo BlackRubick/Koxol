@@ -10,7 +10,7 @@ const CartFlow = () => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [shippingData, setShippingData] = useState({
-    fullName: localStorage.getItem('userFullName') || '',
+    fullName: '',
     address: '',
     zipCode: '',
     houseNumber: '',

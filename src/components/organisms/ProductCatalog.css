@@ -2,7 +2,7 @@
 .koxol-product-catalog {
   width: 100%;
   background: var(--color-bg);
-  padding: 5em 0 3em 0;
+  padding: 5rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -22,7 +22,8 @@
   flex-wrap: wrap;
   justify-content: center;
   width: 100%;
-  max-width: 1200px;
+  max-width: 100%;
+  padding: 0 2rem;
 }
 .product-card {
   background: #fff;
@@ -143,6 +144,8 @@
     flex-direction: column;
     gap: 1.5em;
     align-items: center;
+    max-width: 100%;
+    padding: 0 1rem;
   }
   .product-card {
     min-width: 90vw;
