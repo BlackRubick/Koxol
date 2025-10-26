@@ -9,6 +9,7 @@
   background: linear-gradient(135deg, #EFEBE9 0%, #F1F8E9 50%, #E8F5E9 100%);
   padding: 4rem 2rem;
   overflow: hidden;
+  z-index: 2;
 }
 
 /* Elementos decorativos de fondo */
@@ -634,5 +635,35 @@
   .decoration-circle--3 {
     width: 200px;
     height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-section {
+    padding: 2rem 1rem;
+    margin-top: 2rem;
+  }
+
+  .welcome-section__title {
+    font-size: 1.8rem;
+  }
+
+  .welcome-section__intro {
+    font-size: 1rem;
+  }
+
+  .welcome-section__features {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .feature-badge {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .decoration-circle,
+  .decoration-leaf {
+    display: none;
   }
 }

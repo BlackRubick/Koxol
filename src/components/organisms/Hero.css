@@ -172,13 +172,13 @@
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   animation: fadeIn 1.5s cubic-bezier(.4,0,.2,1);
 }
 
 .koxol-hero__image-frame {
   position: relative;
-  margin-right: -150px;
+  margin-right: -350px;
 }
 
 .koxol-hero__tilt {
@@ -202,7 +202,9 @@
   display: block;
   object-fit: cover;
   transform: scale(1.02);
-  animation: float 6s ease-in-out infinite;}
+  animation: float 6s ease-in-out infinite;
+  margin: 0 auto;
+}
 
 .koxol-hero__image-shine {
   position: absolute;
@@ -299,6 +301,48 @@
   
   .koxol-hero__stat-number {
     font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .koxol-hero {
+    flex-direction: column;
+    padding: 2rem 1rem;
+  }
+
+  .koxol-hero__content {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .koxol-hero__title {
+    font-size: 2rem;
+  }
+
+  .koxol-hero__subtitle {
+    font-size: 1rem;
+  }
+
+  .koxol-hero__img {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .koxol-hero__stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .koxol-hero__image-frame {
+    margin-right: -120px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .koxol-hero__image-frame {
+    margin-right: -350px;
   }
 }
 
