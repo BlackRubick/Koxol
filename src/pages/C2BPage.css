@@ -1,0 +1,54 @@
+/* Styles for C2B Page */
+.c2b-page {
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+  text-align: center;
+}
+
+.c2b-page__container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.c2b-page__title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #880e4f;
+  margin-bottom: 1.5rem;
+}
+
+.c2b-page__description {
+  font-size: 1.2rem;
+  color: #ad1457;
+  margin-bottom: 2rem;
+}
+
+.c2b-page__button {
+  background-color: #d81b60;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.c2b-page__button:hover {
+  background-color: #c2185b;
+}
+
+.c2b-page__discount {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #d81b60;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.c2b-page__discount strong {
+  font-size: 1.2rem;
+  color: #d81b60;
+}

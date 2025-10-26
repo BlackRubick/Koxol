@@ -28,6 +28,8 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import AffiliatedCompanies from './components/organisms/AffiliatedCompanies';
 import NaturalSection from './components/organisms/NaturalSection';
+import SupportSection from './components/organisms/SupportSection';
+import EmpresaPage from './pages/EmpresaPage';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -181,6 +183,20 @@ function App() {
         animation={{ initial: { opacity: 0, y: 50 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } }}
       >
         <AffiliatedCompanies />
+      </AnimatedSection>
+      <AnimatedSection
+        animation={{ initial: { opacity: 0, y: 50 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } }}
+      >
+        <section id="support">
+          <SupportSection />
+        </section>
+      </AnimatedSection>
+      <AnimatedSection
+        animation={{ initial: { opacity: 0, y: 50 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } }}
+      >
+        <section id="empresa">
+          <EmpresaPage />
+        </section>
       </AnimatedSection>
       <Footer />
       <ChatbotButton onClick={() => setChatOpen(o => !o)} />

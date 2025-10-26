@@ -1,0 +1,66 @@
+/* Support Section Styles */
+.support-section {
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f0f4c3 0%, #e8f5e9 100%);
+  text-align: center;
+}
+
+.support-section__container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.support-section__title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #3e2723;
+  margin-bottom: 1.5rem;
+}
+
+.support-section__description {
+  font-size: 1.2rem;
+  color: #5d4037;
+  margin-bottom: 2rem;
+}
+
+.support-section__button {
+  background-color: #8bc34a;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.support-section__button:hover {
+  background-color: #7cb342;
+}
+
+.support-section__help-window {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #8bc34a;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.support-section__help-text {
+  font-size: 1rem;
+  color: #3e2723;
+  margin-bottom: 1rem;
+}
+
+.support-section__meet-link {
+  font-size: 1rem;
+  color: #8bc34a;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.support-section__meet-link:hover {
+  text-decoration: underline;
+}

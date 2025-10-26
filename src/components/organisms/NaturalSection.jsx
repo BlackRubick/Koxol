@@ -26,10 +26,10 @@ const NaturalSection = () => {
   ];
 
   const images = [
-    '/public/natural1.jpg',
-    '/public/natural2.jpg',
-    '/public/natural3.jpg',
-    '/public/natural5.jpg',
+    '/natural1.jpg',
+    '/natural2.jpg',
+    '/natural3.jpg',
+    '/natural5.jpg',
   ];
 
   useEffect(() => {
