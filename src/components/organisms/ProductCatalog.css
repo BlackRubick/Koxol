@@ -179,3 +179,44 @@
     height: 90px;
   }
 }
+@media (max-width: 480px) {
+  .koxol-product-catalog {
+    padding: 2rem 1rem;
+  }
+
+  .koxol-product-catalog__grid {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .product-card {
+    width: 100%;
+    max-width: 90%;
+    padding: 1rem;
+    margin: 0 auto;
+    height: auto;
+  }
+
+  .product-card__img {
+    width: 70px;
+    height: 70px;
+  }
+
+  .product-card__name {
+    font-size: 0.9rem;
+  }
+
+  .product-card__desc {
+    font-size: 0.8rem;
+  }
+
+  .product-card__price {
+    font-size: 1rem;
+  }
+
+  .product-card__buy {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+}

@@ -124,16 +124,14 @@ const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
             <li><a href="/#servicio" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Soporte</a></li>
             <li><a href="/podcast" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Podcast</a></li>
             <li><a href="/#support" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Publicidad</a></li>
+            <li><a href="/#empresa" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Empresa</a></li>
+
             <li className="koxol-navbar__dropdown">
-              <span className="koxol-navbar__mobile-link">Empresa</span>
               <ul className="koxol-navbar__dropdown-menu">
-                <li><a href="/b2b" className="koxol-navbar__link" onClick={handleLinkClick}>B2B</a></li>
-                <li><a href="/c2b" className="koxol-navbar__link" onClick={handleLinkClick}>C2B</a></li>
-                <li><a href="/b2e" className="koxol-navbar__link" onClick={handleLinkClick}>B2E</a></li>
-                <li><a href="/b2i" className="koxol-navbar__link" onClick={handleLinkClick}>B2I</a></li>
+                
+                {/* Removed B2B, C2B, B2E, and B2I links */}
               </ul>
             </li>
-            <li><a href="/#empresa" className="koxol-navbar__link" onClick={handleLinkClick}>Empresa</a></li>
           </ul>
           
           <div className="koxol-navbar__mobile-actions">

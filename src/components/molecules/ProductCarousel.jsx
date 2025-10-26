@@ -42,8 +42,8 @@ const ProductCarousel = ({ products, onView, onAddToCart }) => {
   }, []);
 
   return (
-    <div className="product-carousel">
-      <div className="product-carousel__track" ref={carouselRef}>
+    <div className="product-carousel product-carousel--responsive">
+      <div className="product-carousel__track product-carousel__track--responsive" ref={carouselRef}>
         {products.map((p, i) => {
           const cardProps = { ...p };
           if (typeof onView === 'function') cardProps.onView = () => onView(p);

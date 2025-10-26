@@ -401,3 +401,46 @@
     right: 1.5rem;
   }
 }
+
+@media (max-width: 480px) {
+  .natural-section {
+    padding: 2rem 0.5rem;
+  }
+
+  .natural-section__title {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .natural-section__description {
+    font-size: 1rem;
+    text-align: justify;
+  }
+
+  .natural-section__features {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .natural-section__feature-card {
+    padding: 0.75rem;
+  }
+
+  .natural-section__testimonials {
+    padding: 1rem;
+    min-height: 250px;
+  }
+
+  .natural-section__testimonial {
+    left: 1rem;
+    right: 1rem;
+  }
+
+  .natural-section__image-badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    max-width: 90%;
+    white-space: normal;
+    text-align: center;
+  }
+}

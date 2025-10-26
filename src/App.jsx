@@ -126,10 +126,11 @@ function App() {
           ¡Gracias por tu compra! Pronto recibirás un correo de confirmación.
         </div>
       )}
-      <Hero />
+      
       <AnimatedSection
         animation={{ initial: { opacity: 0, y: 50 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } }}
       >
+        <Hero />
         <WelcomeSection />
       </AnimatedSection>
       <AnimatedSection
@@ -298,6 +299,12 @@ function AnimatedSection({ children, animation }) {
       initial={animation.initial}
       animate={inView ? animation.animate : animation.initial}
       transition={animation.transition}
+      style={{ 
+        position: 'relative',
+        zIndex: 'auto',
+        isolation: 'isolate',
+        width: '100%'
+      }}
     >
       {children}
     </motion.div>

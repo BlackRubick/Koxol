@@ -57,7 +57,9 @@ const NaturalSection = () => {
         <div className="natural-section__grid">
           
           {/* Contenido de texto */}
-          <div className={`natural-section__content ${isVisible ? 'natural-section__content--visible' : ''}`}>
+          <div 
+            className={`natural-section__content ${isVisible ? 'natural-section__content--visible' : ''} natural-section__content--responsive`}
+          >
             
             <div className="natural-section__header">
               <span className="natural-section__badge">
@@ -137,7 +139,9 @@ const NaturalSection = () => {
           </div>
 
           {/* Carrusel de imágenes */}
-          <div className={`natural-section__image-wrapper ${isVisible ? 'natural-section__image-wrapper--visible' : ''}`}>
+          <div 
+            className={`natural-section__image-wrapper ${isVisible ? 'natural-section__image-wrapper--visible' : ''} natural-section__image-wrapper--responsive`}
+          >
             <div className="natural-section__image-container">
               <div className="natural-section__image-frame">
                 <img 

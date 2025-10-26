@@ -67,3 +67,19 @@
     font-size: 1.2rem;
   }
 }
+@media (max-width: 480px) {
+  .product-carousel {
+    padding: 1rem 0;
+    gap: 0.5rem;
+  }
+
+  .product-carousel__track {
+    gap: 1rem;
+  }
+
+  .carousel-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+}
