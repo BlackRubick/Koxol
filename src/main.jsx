@@ -22,7 +22,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/shop/*" element={<Shop />} />
             <Route path="/cart" element={<CartFlowPage />} />
-            <Route path="/podcast" element={<PodcastPage />} /> {/* Nueva ruta para el Podcast */}
+            <Route path="/podcast" element={<PodcastPage />} /> 
           </Routes>
         </BrowserRouter>
       </AuthProvider>
