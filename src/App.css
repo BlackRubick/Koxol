@@ -431,6 +431,11 @@ section + section {
   p {
     font-size: 0.9rem;
   }
+
+  .history {
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+  }
 }
 
 /* Ajustes para móviles muy pequeños (hasta 360px) */
