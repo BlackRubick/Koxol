@@ -250,45 +250,83 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Estilos para el ícono de perfil y menú desplegable */
+/* Contenedor principal del perfil */
 .koxol-navbar__profile {
   position: relative;
   display: flex;
   align-items: center;
   cursor: pointer;
+  gap: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 50px;
+  transition: background 0.3s ease;
 }
 
+.koxol-navbar__profile:hover {
+  background: rgba(85, 139, 47, 0.1);
+}
+
+/* Ícono de usuario */
+.koxol-navbar__profile svg {
+  color: #558B2F;
+  font-size: 28px;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.koxol-navbar__profile:hover svg {
+  transform: scale(1.1);
+  color: #33691E;
+}
+
+/* Dropdown */
 .koxol-navbar__profile-dropdown {
   position: absolute;
-  top: 100%;
+  top: 110%;
   right: 0;
-  background: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
   padding: 1rem;
-  display: none;
+  display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
+  min-width: 220px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
   z-index: 1000;
 }
 
 .koxol-navbar__profile:hover .koxol-navbar__profile-dropdown {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
+/* Texto dentro del menú */
+.koxol-navbar__profile-dropdown p {
+  margin: 0;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* Botón de cerrar sesión */
 .koxol-navbar__profile-dropdown button {
-  background: #558B2F;
+  background: linear-gradient(135deg, #558B2F, #7CB342);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.6rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: transform 0.2s ease, background 0.3s ease;
+  font-weight: 600;
 }
 
-.koxol-navbar__profile-dropdown button:hover {
-  background: #33691E;
-}
+.koxol-navbar__profile-
+
 
 /* Botón 'Compra ahora' */
 .koxol-navbar__button {

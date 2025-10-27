@@ -17,9 +17,10 @@ const ProductCard = ({
   discount,
   rating,
   sales,
-  shipping
+  shipping,
+  onClick // Added onClick prop
 }) => (
-  <div className="product-card">
+  <div className="product-card" onClick={() => onClick(id)}> {/* Trigger onClick with product id */}
     <div className="product-card__img-wrap">
       <img src={image} alt={name} className="product-card__img" />
       {discount ? (
@@ -45,13 +46,7 @@ const ProductCard = ({
       ) : <span style={{ height: '1em', display: 'block' }}></span>}
       <p className="product-card__desc">{desc}</p>
     </div>
-    <div className="product-card__actions">
-      {onAddToCart && (
-        <Button variant="primary" onClick={() => onAddToCart({ id, price, name, desc, image })}>
-          Agregar al carrito
-        </Button>
-      )}
-    </div>
+
   </div>
 );
 

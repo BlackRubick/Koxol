@@ -1,0 +1,50 @@
+.product-cylinder-3d {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+}
+
+.product-cylinder-3d-object {
+  width: 150px;
+  height: 300px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: rotateCylinder 5s linear infinite;
+}
+
+.product-cylinder-3d-object .cylinder-face {
+  position: absolute;
+  width: 150px;
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform-origin: center;
+}
+
+.product-cylinder-3d-object .cylinder-face:nth-child(1) {
+  background-image: url('/spray250.jpeg');
+  transform: rotateY(0deg) translateZ(75px);
+}
+
+.product-cylinder-3d-object .cylinder-face:nth-child(2) {
+  background-image: url('/spray250.jpeg');
+  transform: rotateY(120deg) translateZ(75px);
+}
+
+.product-cylinder-3d-object .cylinder-face:nth-child(3) {
+  background-image: url('/spray250.jpeg');
+  transform: rotateY(240deg) translateZ(75px);
+}
+
+@keyframes rotateCylinder {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}

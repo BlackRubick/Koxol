@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,6 +13,9 @@ export default function Auth() {
     confirmPassword: ''
   });
 
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -21,9 +26,17 @@ export default function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
+    // Simular autenticación
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
+    // Lógica de inicio de sesión o registro
+    const user = {
+      name: formData.name || 'Usuario',
+      email: formData.email
+    };
+    login(user, () => navigate('/shop'));
+
     setIsLoading(false);
   };
 
@@ -562,34 +575,88 @@ export default function Auth() {
 
         @media (max-width: 480px) {
           .auth-header {
-            padding: 32px 24px;
+            padding: 24px 16px;
           }
-          
-          .auth-content {
-            padding: 24px;
+
+          .auth-logo-circle {
+            width: 80px;
+            height: 80px;
+          }
+
+          .auth-logo-icon {
+            font-size: 40px;
           }
 
           .auth-header h1 {
             font-size: 28px;
+          }
+
+          .auth-header p {
+            font-size: 13px;
+          }
+
+          .auth-content {
+            padding: 24px;
+          }
+
+          .auth-toggle-container {
+            margin-bottom: 24px;
+          }
+
+          .auth-toggle-btn {
+            font-size: 13px;
+            padding: 8px 12px;
+          }
+
+          .auth-form-input {
+            padding: 10px 10px 10px 40px;
+            font-size: 13px;
+          }
+
+          .auth-submit-btn {
+            padding: 10px;
+            font-size: 15px;
+          }
+
+          .auth-divider {
+            margin: 20px 0;
+          }
+
+          .auth-divider-text {
+            font-size: 13px;
+          }
+
+          .auth-social-btn {
+            padding: 8px;
+            font-size: 13px;
+          }
+
+          .auth-toggle-text {
+            font-size: 13px;
+          }
+
+          .auth-footer {
+            margin-top: 20px;
+            font-size: 13px;
           }
         }
       `}</style>
 
       <div className="auth-container">
         <div className="floating-leaf leaf1">🍃</div>
-        <div className="floating-leaf leaf2">🍃</div>
-        <div className="floating-leaf leaf3">🍃</div>
-        <div className="floating-leaf sparkle">✨</div>
+        <div className="floating-leaf leaf2">🍂</div>
+        <div className="floating-leaf leaf3">🌿</div>
+        <div className="sparkle">✨</div>
 
         <div className="auth-card-wrapper">
           <div className="auth-card">
             <div className="auth-header">
               <div className="auth-header-content">
                 <div className="auth-logo-circle">
-                  <div className="auth-logo-icon">🍃</div>
+                  <span className="auth-logo-icon">🌱</span>
                 </div>
-                <h1>K'oxol</h1>
-                <p>Tu tienda natural de plantas</p>
+                <h1>Bienvenido</h1>
+                <p>Inicia sesión o regístrate para continuar</p>
               </div>
             </div>
 
@@ -695,10 +762,6 @@ export default function Auth() {
                   )}
                 </button>
               </div>
-
-
-
-<br />
 
               <p className="auth-toggle-text">
                 {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}{' '}

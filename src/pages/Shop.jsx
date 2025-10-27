@@ -6,16 +6,20 @@ import products from '../data/products';
 import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
 import ChatbotButton from '../components/atoms/ChatbotButton';
 import ChatMessenger from '../components/atoms/ChatMessenger';
+import ProductCard from '../components/atoms/ProductCard'; // Import ProductCard
+import Modal from '../components/atoms/Modal'; // Import Modal component
 
 const Shop = () => {
 	const navigate = useNavigate();
-	const { cart, addToCart } = useCart(); // Usar el contexto global del carrito
+	const { cart, addToCart } = useCart(); 
 	const [searchTerm, setSearchTerm] = useState('');
 	const [isMobile, setIsMobile] = useState(false);
 	const [isMuted, setIsMuted] = useState(false);
 	const [volume, setVolume] = useState(0.3);
 	const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 	const [chatOpen, setChatOpen] = useState(false);
+	const [selectedProduct, setSelectedProduct] = useState(null); // State for selected product
+	const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
 	const cartIconRef = useRef(null);
 	const audioRef = useRef(null);
 
@@ -94,6 +98,17 @@ const Shop = () => {
 	const filteredProducts = products.filter(p =>
 		p.name.toLowerCase().includes(searchTerm.toLowerCase())
 	);
+
+	const handleProductClick = (productId) => {
+		const product = products.find(p => p.id === productId);
+		setSelectedProduct(product);
+		setIsModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setIsModalOpen(false);
+		setSelectedProduct(null);
+	};
 
 	return (
 		<div style={styles.container}>
@@ -192,35 +207,15 @@ const Shop = () => {
 							}
 						>
 							{filteredProducts.map(product => (
-								<div
-									id={`product-${product.id}`}
+								<ProductCard
 									key={product.id}
-									className="product-card" // Aplicar clase CSS
-									style={styles.productCard}
-								>
-									<div style={styles.productImage}>
-										<img
-											src={product.image}
-											alt={product.name}
-											style={styles.image}
-										/>
-									</div>
-									<div style={styles.productInfo}>
-										<h3 style={styles.productName}>{product.name}</h3>
-										<div style={styles.priceContainer}>
-											<span style={styles.price}>
-												${product.price} MXN
-											</span>
-										</div>
-										<p style={styles.productDesc}>{product.desc}</p>
-										<button
-											style={styles.addButton}
-											onClick={() => addToCart(product)}
-										>
-											Agregar al carrito
-										</button>
-									</div>
-								</div>
+									id={product.id}
+									price={product.price}
+									image={product.image}
+									name={product.name}
+									desc={product.desc}
+									onClick={handleProductClick} // Pass click handler
+								/>
 							))}
 						</div>
 					</main>
@@ -302,6 +297,13 @@ const Shop = () => {
 
 			{/* Ventana del chatbot */}
 			<ChatMessenger open={chatOpen} onClose={() => setChatOpen(false)} />
+
+			{isModalOpen && selectedProduct && (
+				<Modal
+					product={selectedProduct} // Pass the selected product directly
+					onClose={closeModal}
+				/>
+			)}
 		</div>
 	);
 };

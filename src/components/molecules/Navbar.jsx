@@ -2,15 +2,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
+import { useAuth } from '../../contexts/AuthContext';
 import Button from '../atoms/Button';
 import CartIcon from '../atoms/CartIcon';
 import './Navbar.css';
 
-const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
+const Navbar = ({ cartCount = 0 }) => {
   const navRef = useRef(null);
   const navigate = useNavigate();
+  const { isLoggedIn, userData, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,20 +27,8 @@ const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const storedUserData = localStorage.getItem('userData');
-    const isLoggedIn = localStorage.getItem('koxol_isLoggedIn');
-    console.log('Datos de usuario en localStorage:', storedUserData); // Depuración
-    console.log('Estado de sesión en localStorage:', isLoggedIn); // Depuración
-    if (storedUserData) {
-      setUserData(JSON.parse(storedUserData));
-    } else {
-      console.log('No se encontraron datos de usuario en localStorage');
-    }
-  }, []);
-
   const handleCartClick = () => {
-    navigate('/cart'); 
+    navigate('/shop');
   };
 
   const handleLinkClick = () => {
@@ -47,8 +36,7 @@ const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userData');
-    setUserData(null);
+    logout();
     navigate('/auth');
   };
 
@@ -79,22 +67,28 @@ const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
 
           {/* Acciones Desktop */}
           <div className="koxol-navbar__actions koxol-navbar__actions--desktop">
-            {userData && (
-              <div className="koxol-navbar__profile">
-                <FaUserCircle size={24} />
-                <div className="koxol-navbar__profile-dropdown">
-                  <p>Nombre: {userData.name}</p>
-                  <p>Email: {userData.email}</p>
-                  <button onClick={handleLogout}>Cerrar sesión</button>
+            {isLoggedIn && userData ? (
+              <>
+<div className="koxol-navbar__profile">
+  <FaUserCircle />
+  <span style={{ fontWeight: '500', color: '#33691E' }}>
+    {userData.name.split(' ')[0]}
+  </span>
+  <div className="koxol-navbar__profile-dropdown">
+    <p><strong>Nombre:</strong> {userData.name}</p>
+    <p><strong>Email:</strong> {userData.email}</p>
+    <button onClick={handleLogout}>Cerrar sesión</button>
+  </div>
+</div>
+
+                <div onClick={handleCartClick} className="koxol-navbar__cart">
+                  <CartIcon count={cartCount} />
                 </div>
-              </div>
-            )}
-            {!isLoggedIn ? (
-              <Button variant="secondary" onClick={onLoginClick}>Iniciar sesión</Button>
+              </>
             ) : (
-              <div onClick={handleCartClick} className="koxol-navbar__cart">
-                <CartIcon count={cartCount} />
-              </div>
+              <Button variant="secondary" onClick={() => navigate('/auth')}>
+                Iniciar sesión
+              </Button>
             )}
           </div>
 
@@ -132,20 +126,19 @@ const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
             <li className="koxol-navbar__dropdown">
               <ul className="koxol-navbar__dropdown-menu">
                 
-                {/* Removed B2B, C2B, B2E, and B2I links */}
               </ul>
             </li>
           </ul>
           
           <div className="koxol-navbar__mobile-actions">
-            {!isLoggedIn ? (
-              <Button variant="secondary" onClick={() => { onLoginClick(); setMenuOpen(false); }}>
-                Iniciar sesión
-              </Button>
-            ) : (
+            {isLoggedIn ? (
               <div onClick={() => { handleCartClick(); setMenuOpen(false); }} className="koxol-navbar__cart">
                 <CartIcon count={cartCount} />
               </div>
+            ) : (
+              <Button variant="secondary" onClick={() => { navigate('/auth'); setMenuOpen(false); }}>
+                Iniciar sesión
+              </Button>
             )}
           </div>
         </div>
