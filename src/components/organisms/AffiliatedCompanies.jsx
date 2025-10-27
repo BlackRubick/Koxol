@@ -4,7 +4,7 @@ import './AffiliatedCompanies.css';
 const AffiliatedCompanies = () => {
   const companies = [
     { name: 'Walmart', logo: 'public/Walmart.png', style: { marginTop: '50px' } },
-    { name: 'HEB', logo: '/heb.png' },
+    { name: 'HEB', logo: '/heb.jpeg' },
     { name: 'Chedraui', logo: '/chedraui.jpeg' },
   ];
 
@@ -15,7 +15,7 @@ const AffiliatedCompanies = () => {
         {companies.map((company, index) => (
           <div key={index} className="company-card">
             <img 
-              src={index === 0 ? '/WalmartLogo.png' : index === 1 ? '/HEBLogo.png' : company.logo} 
+              src={index === 0 ? '/wallmart.jpeg' : index === 1 ? '/heb.jpeg' : company.logo} 
               alt={`${company.name} logo`} 
               className="company-logo" 
               style={company.style || {}} 

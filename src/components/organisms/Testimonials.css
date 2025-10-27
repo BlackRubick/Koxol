@@ -177,7 +177,7 @@
 
 .stat-label {
   font-size: 1.05rem;
-  color: #5D4037;
+  color: black;
   font-weight: 600;
 }
 
@@ -302,5 +302,6 @@
 
   .stat-label {
     font-size: 0.9rem;
+    color: black;
   }
 }

@@ -93,16 +93,16 @@ const Testimonials = () => (
     
     <div className="koxol-testimonials__stats">
       <div className="stat-item" style={{ animationDelay: '0s' }}>
-        <div className="stat-number">4.9</div>
-        <div className="stat-label">⭐ Calificación</div>
+        <div className="stat-number" style={{ color: 'black' }}>4.9</div>
+        <div className="stat-label" style={{ color: 'black' }}>⭐ Calificación</div>
       </div>
       <div className="stat-item" style={{ animationDelay: '0.2s' }}>
-        <div className="stat-number">1,200+</div>
-        <div className="stat-label">📝 Reseñas</div>
+        <div className="stat-number" style={{ color: 'black' }}>1,200+</div>
+        <div className="stat-label" style={{ color: 'black' }}>📝 Reseñas</div>
       </div>
       <div className="stat-item" style={{ animationDelay: '0.4s' }}>
-        <div className="stat-number">98%</div>
-        <div className="stat-label">💚 Satisfacción</div>
+        <div className="stat-number" style={{ color: 'black' }}>98%</div>
+        <div className="stat-label" style={{ color: 'black' }}>💚 Satisfacción</div>
       </div>
     </div>
   </section>
