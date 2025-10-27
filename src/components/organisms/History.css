@@ -58,3 +58,27 @@
     color: #3E2723; /* Texto marrón oscuro */
   }
 }
+@media (max-width: 480px) {
+  .koxol-history {
+    min-height: 300px;
+    padding: 20px 10px;
+    background-color: var(--earth);
+    color: var(--lime);
+  }
+
+  .koxol-history__title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .koxol-history__timeline {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .koxol-history__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+}
