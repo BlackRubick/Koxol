@@ -149,7 +149,7 @@ function App() {
         <ProductCatalog onAddToCart={handleAddToCart} />
       </AnimatedSection>
       <AnimatedSection
-        animation={{ initial: { opacity: 0, rotate: -10 }, animate: { opacity: 1, rotate: 0 }, transition: { duration: 0.9 } }}
+        animation={window.innerWidth > 480 ? { initial: { opacity: 0, x: -50 }, animate: { opacity: 1, x: 0 }, transition: { duration: 0.7 } } : { initial: {}, animate: {}, transition: {}}}
       >
         <History />
       </AnimatedSection>
