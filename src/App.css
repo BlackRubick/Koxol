@@ -511,15 +511,20 @@ section + section {
   }
 }
 
+/* Corrección para vista móvil - Botón de volumen */
 @media (max-width: 480px) {
   div[style*="position: fixed"][style*="bottom: 40px"] button {
     width: 45px !important;
     height: 45px !important;
+    border-radius: 50%; /* Garantizar forma perfectamente circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   div[style*="position: fixed"][style*="bottom: 40px"] svg {
-    width: 20px !important;
-    height: 20px !important;
+    width: 22px !important;
+    height: 22px !important;
   }
 
   button[style*="position: fixed"][style*="top: 10px"] {

@@ -99,12 +99,11 @@ function App() {
     const newVolume = parseFloat(event.target.value);
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
-      if (audioRef.current.muted) {
-        audioRef.current.muted = false; // Asegurarse de que el audio no esté silenciado
-        setIsMuted(false);
-      }
     }
     setVolume(newVolume);
+
+    // Ocultar el slider después de ajustar el volumen
+    setTimeout(() => setShowVolumeSlider(false), 2000);
   };
 
   const toggleLanguage = () => {

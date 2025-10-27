@@ -7,7 +7,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background: #4CAF50; /* Color verde brillante del botón de volumen */
   box-shadow: 0 8px 32px 0 rgba(45,80,22,0.18);
   border: none;
   display: flex;
@@ -16,17 +16,23 @@
   cursor: pointer;
   transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
   animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+  font-size: 2rem; /* Tamaño grande para el emoji */
 }
 .chatbot-fab:hover {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-primary));
+  background: #45A049; /* Color verde más oscuro al pasar el cursor */
   box-shadow: 0 12px 40px 0 rgba(45,80,22,0.22);
   transform: scale(1.08);
 }
+/* Corrección para vista móvil - Botón de chatbot */
 @media (max-width: 600px) {
   .chatbot-fab {
     width: 52px;
     height: 52px;
     bottom: 1.2em;
     right: 1.2em;
+    border-radius: 50%; /* Garantizar forma perfectamente circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

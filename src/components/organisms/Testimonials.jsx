@@ -89,7 +89,7 @@ const Testimonials = () => (
       </p>
     </div>
     
-    <TestimonialsCarousel testimonials={testimonials} />
+    <TestimonialsCarousel testimonials={testimonials.slice(0, window.innerWidth > 480 ? testimonials.length : 3)} />
     
     <div className="koxol-testimonials__stats">
       <div className="stat-item" style={{ animationDelay: '0s' }}>

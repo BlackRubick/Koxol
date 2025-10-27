@@ -103,12 +103,9 @@ function FamiliaKoxol() {
                 )}
                 <div className="familia-info">
                   <h3 className="familia-nombre">{m.nombre}</h3>
-                  <div className="familia-producto-badge">
-                    <span className="producto-text">{m.producto}</span>
-                  </div>
                 </div>
                 <div className="flip-hint">
-                  <span className="flip-hint-icon">↻</span>
+                  <span className="flip-hint-icon">⤻</span>
                   <span className="flip-hint-text">Toca para ver más</span>
                 </div>
               </div>
@@ -116,6 +113,7 @@ function FamiliaKoxol() {
                 <div className="familia-back-content">
                   <div className="back-quote-icon">"</div>
                   <h3 className="back-nombre">{m.nombre}</h3>
+                  {/* Mostrar comentario solo en vista normal */}
                   <p className="familia-comentario">{m.comentario}</p>
                   <div className="back-producto">
                     {m.producto}
