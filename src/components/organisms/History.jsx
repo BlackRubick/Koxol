@@ -40,7 +40,7 @@ const cards = [
 ];
 
 const History = () => (
-  <section className="koxol-history" id="historia">
+  <section className="koxol-history" id="historia" style={{ visibility: 'visible', opacity: 1 }}>
     <h2 className="koxol-history__title">Nuestra Historia</h2>
     <div className="koxol-history__timeline">
       {timeline.map((item, i) => (
