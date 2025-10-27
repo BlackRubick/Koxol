@@ -78,10 +78,12 @@
 .podcast-video__text h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
+  top: 20%; /* Move the title higher */
 }
 
 .podcast-video__text p {
   font-size: 1.5rem;
+  top: 0%; /* Move the paragraph lower */
 }
 
 .podcast-section {
@@ -128,4 +130,18 @@
 .audio-button:hover {
   background-color: #2D5016;
   color: #fff;
+}
+
+@media (max-width: 768px) {
+  .podcast-video__text {
+    top: 20%; /* Move text higher for mobile view */
+  }
+
+  .podcast-video__text h1 {
+    font-size: 2rem; /* Adjust font size for smaller screens */
+  }
+
+  .podcast-video__text p {
+    font-size: 1.2rem; /* Adjust font size for smaller screens */
+  }
 }

@@ -8,10 +8,10 @@ const PodcastPage = () => {
   const playAudio = (sectionId) => {
     const audioMap = {
       'origen-citronela': '/1origen.mp3',
-      'mitos-realidades': '/2mitos.mpeg',
-      'mosquitos-salud': '/3mosquitosysalud.mpeg',
-      'spray-crema-pulsera': '/4comoelegir.mpeg',
-      'tips': '/5tips.mpeg',
+      'mitos-realidades': '/2mitos.mp3',
+      'mosquitos-salud': '/3mosquitosysalud.mp3',
+      'spray-crema-pulsera': '/4comoelegir.mp3',
+      'tips': '/5tips.mp3',
     };
 
     if (currentAudio) {
