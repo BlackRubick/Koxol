@@ -1,6 +1,7 @@
 // Organism: Footer premium K'oxol
 import React from 'react';
 import './Footer.css';
+import { FaFacebook, FaInstagram, FaPlay } from 'react-icons/fa';
 
 const Footer = () => (
   <footer className="koxol-footer">
@@ -10,9 +11,15 @@ const Footer = () => (
         <p className="koxol-footer__slogan">Protección natural premium</p>
       </div>
       <div className="koxol-footer__links">
-        <a href="https://www.facebook.com/share/17TdZzrp5P/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook" className="social fb">Facebook</a>
-        <a href="https://www.instagram.com/koxol_repelente?igsh=MW1wZjk5cG5wZWptZg==" target="_blank" rel="noopener" aria-label="Instagram" className="social ig">Instagram</a>
-        <a href="https://www.tiktok.com/@koxolrepelestedemosquito?_t=ZS-90S4bBb117s&_r=1" target="_blank" rel="noopener" aria-label="TikTok" className="social tk">TikTok</a>
+        <a href="https://www.facebook.com/share/17TdZzrp5P/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook" className="social fb">
+          <FaFacebook /> Facebook
+        </a>
+        <a href="https://www.instagram.com/koxol_repelente?igsh=MW1wZjk5cG5wZWptZg==" target="_blank" rel="noopener" aria-label="Instagram" className="social ig">
+          <FaInstagram /> Instagram
+        </a>
+        <a href="https://www.tiktok.com/@koxolrepelestedemosquito?_t=ZS-90S4bBb117s&_r=1" target="_blank" rel="noopener" aria-label="TikTok" className="social tk">
+          <FaPlay /> TikTok
+        </a>
       </div>
       <div className="koxol-footer__contact">
         <p>Blvd. Belisario Domínguez Km. 1081, Tuxtla Gutiérrez, Chiapas</p>
@@ -22,7 +29,7 @@ const Footer = () => (
     </div>
     <div className="koxol-footer__bottom">
       <a href="/politica.html" className="footer-link" target="_blank" rel="noopener">Política de Privacidad</a>
-      <a href="#" className="footer-link">Términos y Condiciones</a>
+      <a href="/terminos.html" className="footer-link" target="_blank" rel="noopener">Términos y Condiciones</a>
       <span>© {new Date().getFullYear()} K’oxol. Todos los derechos reservados.</span>
     </div>
   </footer>

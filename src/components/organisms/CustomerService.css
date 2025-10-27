@@ -129,6 +129,76 @@
 .koxol-customer-service__contact-info a:hover {
   color: var(--color-primary);
 }
+.customer-service {
+  text-align: center;
+  margin: 20px;
+}
+.faq-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.faq-button:hover {
+  background-color: #388E3C;
+}
+.faq-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.faq-card {
+  position: relative;
+}
+.faq-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  text-align: left;
+}
+.faq-modal-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #2E4600;
+}
+.faq-modal-content ul {
+  list-style: none;
+  padding: 0;
+}
+.faq-modal-content li {
+  margin-bottom: 15px;
+  font-size: 1rem;
+  color: #555;
+}
+.close-button {
+  background-color: #E53935;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+.close-button:hover {
+  background-color: #B71C1C;
+}
 @media (max-width: 900px) {
   .koxol-customer-service__channels {
     gap: 1.3em;
@@ -139,9 +209,10 @@
     padding: 2.5em 0 1.2em 0;
   }
   .koxol-customer-service__channels {
-    flex-direction: column;
+    flex-direction: row; /* Mantener las tarjetas en diseño horizontal */
+    flex-wrap: wrap; /* Permitir que las tarjetas se ajusten si no caben en una fila */
     gap: 1.5em;
-    align-items: center;
+    justify-content: center;
   }
   .customer-channel {
     min-width: 90vw;

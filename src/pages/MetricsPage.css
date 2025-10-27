@@ -1,0 +1,25 @@
+.metrics-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.metrics-container h1 {
+  font-size: 2.5rem;
+  color: #2E4600;
+  margin-bottom: 20px;
+}
+
+.metrics-container p {
+  font-size: 1.2rem;
+  color: #4CAF50;
+  margin: 10px 0;
+}
+
+.chart-container {
+  margin-top: 30px;
+  width: 80%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}

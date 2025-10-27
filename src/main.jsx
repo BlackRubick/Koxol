@@ -7,6 +7,8 @@ import AuthPage from './components/pages/Auth.jsx';
 import Shop from './pages/Shop.jsx';
 import CartFlowPage from './pages/CartFlowPage.jsx';
 import PodcastPage from './pages/PodcastPage.jsx'; // Importar la nueva página del Podcast
+import BlogPage from './pages/BlogPage.jsx'; // Importar la nueva página del Blog
+import FAQPage from './pages/FAQPage.jsx'; // Import the FAQ page
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -24,7 +26,8 @@ createRoot(document.getElementById('root')).render(
             <Route path="/shop/*" element={<Shop />} />
             <Route path="/cart" element={<CartFlowPage />} />
             <Route path="/podcast" element={<PodcastPage />} /> 
-
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/faq" element={<FAQPage />} /> {/* Add FAQ route */}
           </Routes>
         </BrowserRouter>
       </AuthProvider>

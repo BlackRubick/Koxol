@@ -72,8 +72,9 @@ const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
             <li><a href="/#servicio" className="koxol-navbar__link" onClick={() => navigate('/#servicio')}>Soporte</a></li>
             <li><a href="/podcast" className="koxol-navbar__link">Podcast</a></li>
             <li><a href="/#support" className="koxol-navbar__link" onClick={() => navigate('/#support')}>Publicidad</a></li>
-
             <li><a href="/#empresa" className="koxol-navbar__link" onClick={() => navigate('/#empresa')}>Empresa</a></li>
+            <li><a href="/blog" className="koxol-navbar__link">Blog</a></li>
+            <li><a href="/#metrics" className="koxol-navbar__link">Métricas</a></li>
           </ul>
 
           {/* Acciones Desktop */}
@@ -125,6 +126,8 @@ const Navbar = ({ cartCount = 0, isLoggedIn, onLoginClick }) => {
             <li><a href="/podcast" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Podcast</a></li>
             <li><a href="/#support" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Publicidad</a></li>
             <li><a href="/#empresa" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Empresa</a></li>
+            <li><a href="/blog" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Blog</a></li>
+            <li><a href="/#metrics" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Métricas</a></li>
 
             <li className="koxol-navbar__dropdown">
               <ul className="koxol-navbar__dropdown-menu">

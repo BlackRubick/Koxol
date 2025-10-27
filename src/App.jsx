@@ -30,6 +30,10 @@ import AffiliatedCompanies from './components/organisms/AffiliatedCompanies';
 import NaturalSection from './components/organisms/NaturalSection';
 import SupportSection from './components/organisms/SupportSection';
 import EmpresaPage from './pages/EmpresaPage';
+import BlogPage from './pages/BlogPage';
+import MetricsPage from './pages/MetricsPage';
+import MetricsSection from './components/organisms/MetricsSection';
+import { Route, Routes } from 'react-router-dom';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -198,6 +202,13 @@ function App() {
           <EmpresaPage />
         </section>
       </AnimatedSection>
+      <AnimatedSection
+        animation={{ initial: { opacity: 0, y: 50 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } }}
+      >
+        <section id="metrics">
+          <MetricsSection />
+        </section>
+      </AnimatedSection>
       <Footer />
       <ChatbotButton onClick={() => setChatOpen(o => !o)} />
       <ChatMessenger open={chatOpen} onClose={() => setChatOpen(false)} />
@@ -285,6 +296,11 @@ function App() {
       <button onClick={toggleLanguage} style={{ position: 'fixed', top: '10px', right: '10px' }}>
         {i18n.language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
       </button>
+
+      <Routes>
+        <Route path="/blog" element={<BlogPage />} />
+        <Route path="/metrics" element={<MetricsPage />} />
+      </Routes>
     </>
   );
 }

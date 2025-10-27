@@ -1,0 +1,83 @@
+/* Estilos para la página de Preguntas Frecuentes (FAQPage) */
+
+.faq-page {
+  padding: 2em;
+  font-family: 'Arial', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-light);
+  line-height: 1.6;
+}
+
+.faq-page h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  text-align: center;
+  margin-bottom: 1.5em;
+}
+
+.faq-page ol {
+  list-style: none;
+  padding: 0;
+  counter-reset: faq-counter;
+}
+
+.faq-page ol li {
+  counter-increment: faq-counter;
+  margin-bottom: 1.5em;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  padding: 1.5em;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 1em;
+}
+
+.faq-page ol li:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.faq-page ol li::before {
+  content: counter(faq-counter) ". ";
+  font-weight: bold;
+  color: var(--color-accent);
+  margin-right: 0.5em;
+}
+
+.faq-page ol li .faq-icon {
+  font-size: 2rem;
+  color: var(--color-accent);
+}
+
+.faq-page ol li strong {
+  color: var(--color-primary);
+  font-size: 1.2rem;
+}
+
+.faq-page ol li p {
+  margin: 0.5em 0 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .faq-page {
+    padding: 1.5em;
+  }
+
+  .faq-page h1 {
+    font-size: 2rem;
+  }
+
+  .faq-page ol li {
+    padding: 1em;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .faq-page ol li .faq-icon {
+    font-size: 1.5rem;
+  }
+}
