@@ -14,6 +14,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import './i18n'; // Importar configuración de i18n
+import AdminOrders from './components/pages/AdminOrders.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,11 +24,12 @@ createRoot(document.getElementById('root')).render(
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/admin/orders" element={<AdminOrders />} />
             <Route path="/shop/*" element={<Shop />} />
             <Route path="/cart" element={<CartFlowPage />} />
             <Route path="/podcast" element={<PodcastPage />} /> 
             <Route path="/blog" element={<BlogPage />} />
-            <Route path="/faq" element={<FAQPage />} /> {/* Add FAQ route */}
+            <Route path="/faq" element={<FAQPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

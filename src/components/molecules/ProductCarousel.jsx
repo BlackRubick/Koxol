@@ -46,7 +46,8 @@ const ProductCarousel = ({ products, onView, onAddToCart }) => {
       <div className="product-carousel__track product-carousel__track--responsive" ref={carouselRef}>
         {products.map((p, i) => {
           const cardProps = { ...p };
-          if (typeof onView === 'function') cardProps.onView = () => onView(p);
+          // Provide an onClick handler expected by ProductCard that opens product view
+          if (typeof onView === 'function') cardProps.onClick = () => onView(p);
           if (typeof onAddToCart === 'function') cardProps.onAddToCart = () => onAddToCart(p);
           if (p.onAddToCart && typeof p.onAddToCart === 'function') cardProps.onAddToCart = () => p.onAddToCart(p);
           return <ProductCard key={p.id || p.name} {...cardProps} />;

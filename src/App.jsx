@@ -34,6 +34,7 @@ import BlogPage from './pages/BlogPage';
 import MetricsPage from './pages/MetricsPage';
 import MetricsSection from './components/organisms/MetricsSection';
 import { Route, Routes } from 'react-router-dom';
+import { getJSON, setJSON } from './utils/storage';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -73,7 +74,28 @@ function App() {
 
   const handleCheckout = () => setCheckoutOpen(true);
 
-  const handleConfirmOrder = (form) => {
+  const handleConfirmOrder = async (form) => {
+    // Construir objeto de pedido y guardarlo en localStorage para que lo vea el admin
+    const total = cart.reduce((acc, item) => acc + (item.price || 0) * item.qty, 0);
+    const order = {
+      id: Date.now().toString(),
+      items: cart,
+      buyer: form,
+      paymentMethod: form.paymentMethod || 'No especificado',
+      status: 'pending',
+      shippingCarrier: null,
+      createdAt: new Date().toISOString(),
+      total
+    };
+
+    try {
+      // Use orders API abstraction to persist order (fallback to localStorage)
+      const { createOrder } = await import('./api/orders');
+      await createOrder(order);
+    } catch (err) {
+      console.error('Error guardando pedido (API):', err);
+    }
+
     setOrderSuccess(true);
     setCheckoutOpen(false);
     clearCart();

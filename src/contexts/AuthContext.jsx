@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getJSON, setJSON, removeKey } from '../utils/storage';
 
 const AuthContext = createContext(null);
 
@@ -8,9 +9,9 @@ export const AuthProvider = ({ children }) => {
 
   // Recuperar datos de localStorage al cargar la aplicación
   useEffect(() => {
-    const storedUser = localStorage.getItem('userData');
+    const storedUser = getJSON('userData', null);
     if (storedUser) {
-      setUserData(JSON.parse(storedUser));
+      setUserData(storedUser);
       setIsLoggedIn(true);
     }
   }, []);
@@ -18,20 +19,22 @@ export const AuthProvider = ({ children }) => {
   const login = (user, cb) => {
     console.log('Iniciando sesión...'); // Depuración
     setIsLoggedIn(true);
-    setUserData(user); // Guardar datos del usuario
-    localStorage.setItem('userData', JSON.stringify(user)); // Persistir en localStorage
+  setUserData(user); // Guardar datos del usuario
+  setJSON('userData', user); // Persistir en localStorage de forma segura
     if (typeof cb === 'function') cb();
   };
 
   const logout = () => {
     console.log('Cerrando sesión...'); // Depuración
-    setIsLoggedIn(false);
-    setUserData(null); // Eliminar datos del usuario
-    localStorage.removeItem('userData'); // Eliminar de localStorage
+  setIsLoggedIn(false);
+  setUserData(null);
+  removeKey('userData');
   };
 
+  const isAdmin = userData?.role === 'admin';
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userData, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userData, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

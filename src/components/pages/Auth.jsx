@@ -31,9 +31,22 @@ export default function Auth() {
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Lógica de inicio de sesión o registro
+    // Si es el administrador con credenciales conocidas, asignar rol admin
+    if (isLogin && formData.email === 'admin@hotmail.com' && formData.password === 'admin123') {
+      const adminUser = {
+        name: 'Administrador',
+        email: formData.email,
+        role: 'admin'
+      };
+      login(adminUser, () => navigate('/admin/orders'));
+      setIsLoading(false);
+      return;
+    }
+
     const user = {
       name: formData.name || 'Usuario',
-      email: formData.email
+      email: formData.email,
+      role: 'customer'
     };
     login(user, () => navigate('/shop'));
 

@@ -1,5 +1,6 @@
 // Modal.js
 import React, { useState, useEffect } from 'react';
+import { getJSON, setJSON } from '../../utils/storage';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import './Modal.css';
@@ -19,9 +20,28 @@ const Modal = ({ product, onClose }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   useEffect(() => {
-    const storedComments = JSON.parse(localStorage.getItem(`comments_${product.id}`)) || [];
+    const storedComments = getJSON(`comments_${product.id}`, []) || [];
     setComments(storedComments);
   }, [product.id]);
+
+  // Prevent background page from scrolling while modal is open
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow || '';
+    };
+  }, []);
+
+  // If this product has a video and we want to show it by default for product id 3,
+  // If this product has a video, show the video by default when opening the modal.
+  useEffect(() => {
+    if (product.video) {
+      setCurrentImageIndex(product.images.length);
+    } else {
+      setCurrentImageIndex(0);
+    }
+  }, [product.id, product.video, product.images.length]);
 
   const handleCommentSubmit = () => {
     if (!comment.trim() || rating === 0) return;
@@ -33,9 +53,9 @@ const Modal = ({ product, onClose }) => {
       rating,
       date: new Date().toLocaleDateString('es-MX')
     };
-    const updatedComments = [newComment, ...comments];
-    setComments(updatedComments);
-    localStorage.setItem(`comments_${product.id}`, JSON.stringify(updatedComments));
+  const updatedComments = [newComment, ...comments];
+  setComments(updatedComments);
+  setJSON(`comments_${product.id}`, updatedComments);
     setComment('');
     setRating(0);
   };
@@ -47,24 +67,34 @@ const Modal = ({ product, onClose }) => {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === product.images.length - 1 ? 0 : prev + 1
-    );
+    const total = product.images.length + (product.video ? 1 : 0);
+    setCurrentImageIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? product.images.length - 1 : prev - 1
-    );
+    const total = product.images.length + (product.video ? 1 : 0);
+    setCurrentImageIndex((prev) => (prev === 0 ? total - 1 : prev - 1));
   };
 
   const averageRating = comments.length > 0
     ? (comments.reduce((sum, c) => sum + c.rating, 0) / comments.length).toFixed(1)
     : 0;
 
+  // Only treat common video container extensions as video (exclude .mpeg/.mp3 podcasts)
+  const isVideoSrc = (src) => typeof src === 'string' && /\.(mp4|webm|ogv)$/i.test(src);
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* SVG sharpen filter definition for higher perceived video quality */}
+        <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true" focusable="false">
+          <defs>
+            <filter id="modal-sharpen-filter" x="-10%" y="-10%" width="120%" height="120%">
+              {/* simple sharpen kernel */}
+              <feConvolveMatrix order="3" kernelMatrix="0 -1 0 -1 5 -1 0 -1 0" divisor="1" />
+            </filter>
+          </defs>
+        </svg>
         {/* Header */}
         <div className="modal-header">
           <h2>{product.name}</h2>
@@ -75,23 +105,53 @@ const Modal = ({ product, onClose }) => {
           {/* Left Column - Images */}
           <div className="modal-images-section">
             <div className="main-image-container">
-              {currentImageIndex === 3 && product.id === 2 ? (
-                <Product3DViewer />
-              ) : (
-                <img
-                  src={product.images[currentImageIndex]}
-                  alt={`${product.name} ${currentImageIndex + 1}`}
-                  className="main-image"
-                />
-              )}
-              
-              {product.images.length > 1 && (
+              {(() => {
+                const imagesCount = product.images.length;
+                // If index points to video (after images)
+                if (product.video && currentImageIndex === imagesCount) {
+                  return (
+                    <video
+                        src={product.video}
+                        className="main-video"
+                        playsInline
+                        autoPlay
+                        muted
+                        loop
+                        // Prevent user interactions that pause or enter fullscreen
+                        onClick={(e) => { e.preventDefault(); e.currentTarget.play(); }}
+                        onDoubleClick={(e) => { e.preventDefault(); }}
+                        onPause={(e) => { /* ensure it keeps playing */ e.currentTarget.play(); }}
+                        onContextMenu={(e) => e.preventDefault()}
+                      />
+                  );
+                }
+
+                const currentMedia = product.images[currentImageIndex];
+                if (!currentMedia) return <Product3DViewer />;
+                return (
+                  <img
+                    src={currentMedia}
+                    alt={`${product.name} ${currentImageIndex + 1}`}
+                    className="main-image"
+                  />
+                );
+              })()}
+
+              { (product.images.length + (product.video ? 1 : 0)) > 1 && (
                 <>
-                  <button onClick={prevImage} className="image-nav prev">‹</button>
-                  <button onClick={nextImage} className="image-nav next">›</button>
-                  
+                  <button onClick={prevImage} className="image-nav prev" aria-label="Anterior">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M15 18L9 12l6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <button onClick={nextImage} className="image-nav next" aria-label="Siguiente">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+
                   <div className="image-indicators">
-                    {product.images.map((_, index) => (
+                    {Array.from({ length: product.images.length + (product.video ? 1 : 0) }).map((_, index) => (
                       <span
                         key={index}
                         className={`indicator ${index === currentImageIndex ? 'active' : ''}`}
@@ -103,7 +163,7 @@ const Modal = ({ product, onClose }) => {
             </div>
 
             {/* Thumbnail Gallery */}
-            {product.images.length > 1 && (
+            {(product.images.length + (product.video ? 1 : 0)) > 1 && (
               <div className="thumbnail-gallery">
                 {product.images.map((img, index) => (
                   <button
@@ -111,13 +171,23 @@ const Modal = ({ product, onClose }) => {
                     onClick={() => setCurrentImageIndex(index)}
                     className={`thumbnail ${index === currentImageIndex ? 'active' : ''}`}
                   >
-                    {index === 3 && product.id === 2 ? (
-                      <div className="thumbnail-3d">3D</div>
-                    ) : (
-                      <img src={img} alt={`Miniatura ${index + 1}`} />
-                    )}
+                    <img src={img} alt={`Miniatura ${index + 1}`} />
                   </button>
                 ))}
+
+                {product.video && (
+                  <button
+                    key="video-thumb"
+                    onClick={() => setCurrentImageIndex(product.images.length)}
+                    className={`thumbnail ${product.images.length === currentImageIndex ? 'active' : ''}`}
+                  >
+                    <div className="thumbnail-video-wrap">
+                      <video src={product.video} muted playsInline loop className="thumbnail-video" />
+                      <div className="video-overlay">▶</div>
+                    </div>
+                  </button>
+                )}
+
               </div>
             )}
           </div>
@@ -252,10 +322,7 @@ const Modal = ({ product, onClose }) => {
           </div>
         </div>
 
-        {/* 3D Viewer - Simplified rotating 3D model */}
-        <div className="product-3d-viewer">
-          <Product3DViewer />
-        </div>
+
       </div>
     </div>
   );

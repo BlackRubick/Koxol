@@ -4,7 +4,26 @@ import Button from '../atoms/Button';
 import Tilt from 'react-parallax-tilt';
 import './Hero.css';
 
-const Hero = () => (
+const Hero = () => {
+  const handleDiscoverClick = (e) => {
+    e.preventDefault();
+    const el = document.getElementById('catalogo');
+    if (el) {
+      // if there's a sticky navbar, scrolling to start may hide the top; smooth scroll for UX
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // optional small offset for sticky header: scroll a bit up after intoView
+      setTimeout(() => {
+        const yOffset = -16; // small offset (adjust if navbar hides it)
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }, 400);
+    } else {
+      // fallback: try navigating to home with hash
+      window.location.href = '/#catalogo';
+    }
+  };
+
+  return (
   <section className="koxol-hero">
     <div className="koxol-hero__ambient-orb koxol-hero__ambient-orb--1"></div>
     <div className="koxol-hero__ambient-orb koxol-hero__ambient-orb--2"></div>
@@ -28,7 +47,7 @@ const Hero = () => (
         </p>
         
         <div className="koxol-hero__cta">
-          <Button variant="primary" style={{fontSize: '1.1rem', padding: '1rem 2.5rem'}}>
+          <Button variant="primary" style={{fontSize: '1.1rem', padding: '1rem 2.5rem'}} onClick={handleDiscoverClick}>
             Descubre la protección natural
           </Button>
           <div className="koxol-hero__stats">
@@ -75,5 +94,7 @@ const Hero = () => (
     <div className="koxol-hero__bg-glass" />
   </section>
 );
+
+}
 
 export default Hero;

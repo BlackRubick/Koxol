@@ -3,74 +3,85 @@ const products = [
   {
     id: 2,
     name: 'Spray Antimosquitos 250ml',
-    price: 129,
+    price: 75,
     desc: 'Formato práctico para llevar a cualquier lugar.',
     image: '/spray250.jpeg',
-    images: ['/repelente250.jpeg', '/repelente250atras.jpeg', '/repelente250verde.jpeg',""]
+    images: ['/repelente250.jpeg', '/repelente250atras.jpeg', '/repelente250verde.jpeg'],
+    video: '/video3dspray.mp4'
+
   },
   {
     id: 3,
     name: 'Crema Repelente 400ml',
-    price: 229,
+    price: 180,
     desc: 'Hidrata y protege tu piel de forma natural.',
     image: '/crema400.jpeg',
-    images: ['/crema400_1.jpeg', '/crema400_2.jpeg', '/crema400_3.jpeg']
+    images: ['/cremarepelente1.jpeg', '/cremarepelente2.jpeg', '/cremarepelente3.jpeg'],
+    video: '/cremaRepelente400.mp4'
   },
   {
     id: 4,
     name: 'Crema Repelente 180ml',
-    price: 119,
+    price: 90,
     desc: 'Ideal para niños y pieles sensibles.',
-    image: '/repelente250.jpeg',
-    images: ['/repelente250_1.jpeg', '/repelente250_2.jpeg', '/repelente250_3.jpeg']
+    image: '/crema.jpeg',
+    images: ['/cremarepelentefrente180.jpeg', '/cremarepelentefrente180atras.jpeg', '/cremarepelenteverde.jpeg'],
+    video: '/video3dcrema.mp4'
+
   },
   {
     id: 5,
     name: 'Velas Repelentes',
-    price: 89,
+    price: 60,
     desc: 'Ambienta y protege tus espacios con aroma natural.',
     image: '/vela.jpeg',
-    images: ['/vela_1.jpeg', '/vela_2.jpeg', '/vela_3.jpeg']
+    images: ['/velarepelenteverde.jpeg', '/vela.jpeg', '/velarepelenteverder2.jpeg'],
+    video: '/vela.mp4'
   },
   {
     id: 6,
     name: 'Lociones',
-    price: 149,
+    price: 450,
     desc: 'Fórmulas suaves y efectivas para uso diario.',
     image: '/locion.jpeg',
-    images: ['/locion_1.jpeg', '/locion_2.jpeg', '/locion_3.jpeg']
+    images: ['/locionverde.jpeg', '/locion.jpeg', '/locionatras.jpeg'],
+    video: '/spray.mp4'
   },
   {
     id: 7,
     name: 'Esencias para difusor',
-    price: 159,
+    price: 350,
     desc: 'Aromatiza y protege tu hogar naturalmente.',
     image: '/difusor.jpeg',
-    images: ['/difusor_1.jpeg', '/difusor_2.jpeg', '/difusor_3.jpeg']
+    images: ['/esenciaverde.jpeg', '/difusor.jpeg', '/esenciaatras.jpeg'],
+    video: '/difusor3d.mp4'
   },
   {
     id: 8,
     name: 'Pulseras antimosquitos (negro)',
-    price: 49,
+    price: 180,
     desc: 'Protección portátil y elegante en color negro.',
     image: '/pulsera.jpeg',
-    images: ['/pulsera_1.jpeg', '/pulsera_2.jpeg', '/pulsera_3.jpeg']
+    images: ['/pulseranegra.jpeg', '/pulsera.jpeg', '/pulseraatras.jpeg'],
+    video: '/pulseranegra3d.mp4'
   },
   {
     id: 9,
     name: 'Pulseras antimosquitos (rosa)',
-    price: 49,
+    price: 180,
     desc: 'Protección portátil y elegante en color rosa.',
     image: '/pulserarosa.jpeg',
-    images: ['/pulserarosa_1.jpeg', '/pulserarosa_2.jpeg', '/pulserarosa_3.jpeg']
+    images: ['/pulserarosaverde.jpeg', '/pulserarosa.jpeg', '/pulseraatras.jpeg'],
+    video: '/pulserarosa3d.mp4'
   },
   {
     id: 10,
     name: 'Pulseras antimosquitos (azul)',
-    price: 49,
+    price: 180,
     desc: 'Protección portátil y elegante en color azul.',
     image: '/pulseraazul.jpeg',
-    images: ['/pulseraazul_1.jpeg', '/pulseraazul_2.jpeg', '/pulseraazul_3.jpeg']
+    images: ['/pulseraazulverde.jpeg', '/pulseraazul.jpeg', '/pulsernaatras.jpeg'],
+    video: '/pulseraazul3d.mp4'
   }
 ];
 

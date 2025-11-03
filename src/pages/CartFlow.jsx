@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Minus, Plus } from 'lucide-react';
-import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { ArrowLeft, Minus, Plus, Volume2, VolumeX } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
+import PaymentModal from '../components/atoms/PaymentModal';
+import { getJSON, setJSON } from '../utils/storage';
 
 const CartFlow = () => {
   const { cart, setCart } = useCart();
@@ -21,6 +22,8 @@ const CartFlow = () => {
   const [volume, setVolume] = useState(0.3);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const audioRef = useRef(null);
+  const [paymentModalMethod, setPaymentModalMethod] = useState(null);
+  const [showAwaitingPayment, setShowAwaitingPayment] = useState(false);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -53,20 +56,17 @@ const CartFlow = () => {
     console.log('🔍 Validando datos del formulario...');
     console.log('Datos actuales:', shippingData);
     
-    // Validar que todos los campos requeridos estén llenos
     if (!shippingData.fullName || !shippingData.address || !shippingData.zipCode || 
         !shippingData.houseNumber || !shippingData.phone) {
       alert('Por favor completa todos los campos requeridos');
       return;
     }
     
-    // Validar código postal (5 dígitos)
     if (shippingData.zipCode.length !== 5) {
       alert('El código postal debe tener 5 dígitos');
       return;
     }
     
-    // Validar teléfono (10 dígitos)
     if (shippingData.phone.length !== 10) {
       alert('El teléfono debe tener 10 dígitos');
       return;
@@ -76,13 +76,45 @@ const CartFlow = () => {
     setShowPaymentOptions(true);
   };
 
-  const handleConfirmOrder = (paymentMethod) => {
+  const handleConfirmOrder = async (paymentMethod) => {
     console.log('=== CONFIRMANDO ORDEN ===');
     console.log('Datos de envío:', shippingData);
     console.log('Carrito:', cart);
     console.log('Total:', total);
     console.log('Método de pago:', paymentMethod);
-    alert(`¡Orden confirmada!\nMétodo de pago: ${paymentMethod}\nTotal: $${total.toFixed(2)}`);
+
+    // Construir objeto de pedido y guardarlo en localStorage para que lo vea el admin
+    const order = {
+      id: Date.now().toString(),
+      items: cart,
+      buyer: {
+        nombre: shippingData.fullName,
+        email: shippingData.email || '',
+        direccion: `${shippingData.address} ${shippingData.houseNumber}`,
+        telefono: shippingData.phone
+      },
+      paymentMethod: paymentMethod || 'No especificado',
+      status: 'pending',
+      shippingCarrier: null,
+      createdAt: new Date().toISOString(),
+      total
+    };
+
+    try {
+      // Use API abstraction to create order (falls back to localStorage)
+      const { createOrder } = await import('../api/orders');
+      await createOrder(order);
+    } catch (err) {
+      console.error('Error guardando pedido desde CartFlow (API):', err);
+    }
+
+    // Limpiar carrito y cerrar checkout
+    setCart([]);
+    setShowPaymentOptions(false);
+    setShowCheckout(false);
+    // Mostrar un pequeño toast o mensaje de espera si se requiere
+    setShowAwaitingPayment(true);
+    setTimeout(() => setShowAwaitingPayment(false), 4000);
   };
 
   const updateQty = (id, delta) => {
@@ -153,32 +185,900 @@ const CartFlow = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <audio ref={audioRef} src="/musica-relajante.mp3" loop />
+    <>
+      <style>{`
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
 
-      <div 
-        onMouseEnter={() => setShowVolumeSlider(true)}
-        onMouseLeave={() => setShowVolumeSlider(false)}
-        style={{ 
-          position: 'fixed', 
-          bottom: '40px', 
-          left: '20px', 
-          zIndex: 1000,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '10px'
-        }}
-      >
-        {showVolumeSlider && (
-          <div style={{
-            padding: '0',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '10px',
-            marginBottom: '10px'
-          }}>
+        .cart-container {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+          background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
+          min-height: 100vh;
+          width: 100%;
+        }
+
+        .header {
+          background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+          border-bottom: 1px solid rgba(23, 108, 58, 0.1);
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .header-content {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 1.2rem 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .logo {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          cursor: pointer;
+          transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+          transform: scale(1.02);
+        }
+
+        .logo-koxol {
+          font-size: 1.8rem;
+          font-weight: 900;
+          color: #176c3a;
+          letter-spacing: -0.5px;
+        }
+
+        .logo-sub {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #169c7c;
+        }
+
+        .audio-controls {
+          position: fixed;
+          bottom: 40px;
+          left: 30px;
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .volume-slider-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 10px;
+          opacity: 0;
+          transform: translateY(10px);
+          transition: all 0.3s ease;
+          pointer-events: none;
+        }
+
+        .audio-controls:hover .volume-slider-wrapper {
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: all;
+        }
+
+        .volume-slider {
+          width: 120px;
+          cursor: pointer;
+          transform: rotate(-90deg);
+          -webkit-appearance: none;
+          height: 6px;
+          background: linear-gradient(to right, #176c3a 0%, #176c3a var(--volume-percent, 30%), #e0e0e0 var(--volume-percent, 30%), #e0e0e0 100%);
+          border-radius: 3px;
+          outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 16px;
+          height: 16px;
+          background: #176c3a;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+          transition: all 0.2s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+        }
+
+        .volume-slider::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          background: #176c3a;
+          border-radius: 50%;
+          border: none;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .volume-percent {
+          font-size: 12px;
+          color: #666;
+          font-weight: 600;
+          margin-top: 35px;
+        }
+
+        .mute-button {
+          width: 65px;
+          height: 65px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+          transition: all 0.3s ease;
+          color: white;
+        }
+
+        .mute-button:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
+        }
+
+        .mute-button.muted {
+          background: linear-gradient(135deg, #999 0%, #888 100%);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Awaiting payment modal styles */
+        .await-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.55);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 2500;
+          animation: fadeIn 240ms ease;
+        }
+
+        .await-card {
+          width: 520px;
+          max-width: calc(100% - 40px);
+          background: linear-gradient(145deg, #ffffff 0%, #f7fffb 100%);
+          border-radius: 14px;
+          box-shadow: 0 30px 90px rgba(11, 63, 34, 0.18);
+          overflow: hidden;
+          transform-origin: center;
+          animation: popIn 320ms cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        .await-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 18px 20px;
+          background: linear-gradient(90deg, rgba(23,108,58,0.12), rgba(23,108,58,0.06));
+        }
+
+        .await-title {
+          font-size: 18px;
+          color: #12492a;
+          font-weight: 800;
+        }
+
+        .await-close {
+          background: transparent;
+          border: none;
+          font-size: 20px;
+          cursor: pointer;
+          color: #12492a;
+        }
+
+        .await-content {
+          padding: 22px;
+        }
+
+        .await-body {
+          color: #2e5e44;
+          line-height: 1.6;
+          font-weight: 600;
+          margin-bottom: 18px;
+        }
+
+        .await-actions {
+          display: flex;
+          justify-content: flex-end;
+        }
+
+        @keyframes popIn {
+          0% { transform: translateY(18px) scale(0.98); opacity: 0 }
+          60% { transform: translateY(-6px) scale(1.01) }
+          100% { transform: translateY(0) scale(1); opacity: 1 }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0 }
+          to { opacity: 1 }
+        }
+
+        .main-wrapper {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+
+        .back-button {
+          background: white;
+          color: #176c3a;
+          padding: 12px 24px;
+          border: 2px solid #176c3a;
+          border-radius: 10px;
+          cursor: pointer;
+          font-size: 15px;
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 2rem;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(23, 108, 58, 0.1);
+        }
+
+        .back-button:hover {
+          background: #176c3a;
+          color: white;
+          transform: translateX(-3px);
+          box-shadow: 0 6px 20px rgba(23, 108, 58, 0.2);
+        }
+
+        .cart-layout {
+          display: grid;
+          grid-template-columns: 1fr 420px;
+          gap: 2rem;
+          align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+          .cart-layout {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .cart-items {
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+          padding: 2rem;
+          animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .section {
+          margin-bottom: 2rem;
+        }
+
+        .section-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 1rem;
+          padding-bottom: 0.8rem;
+          border-bottom: 2px solid #f0f0f0;
+        }
+
+        .checkbox {
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+          accent-color: #176c3a;
+        }
+
+        .section-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #333;
+          flex: 1;
+        }
+
+        .full-badge {
+          background: linear-gradient(135deg, #176c3a 0%, #1a8447 100%);
+          color: white;
+          border-radius: 20px;
+          padding: 4px 14px;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+        }
+
+        .cart-item {
+          display: grid;
+          grid-template-columns: auto auto 1fr auto;
+          gap: 16px;
+          padding: 20px;
+          background: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 100%);
+          border-radius: 12px;
+          margin-bottom: 12px;
+          transition: all 0.3s ease;
+          border: 2px solid transparent;
+        }
+
+        .cart-item:hover {
+          border-color: #176c3a;
+          box-shadow: 0 6px 20px rgba(23, 108, 58, 0.1);
+          transform: translateY(-2px);
+        }
+
+        .item-image {
+          width: 80px;
+          height: 80px;
+          border-radius: 10px;
+          object-fit: cover;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-details {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .item-name {
+          font-size: 16px;
+          font-weight: 600;
+          color: #222;
+          line-height: 1.4;
+        }
+
+        .remove-btn {
+          background: none;
+          color: #e63946;
+          border: none;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 600;
+          padding: 0;
+          transition: all 0.2s ease;
+        }
+
+        .remove-btn:hover {
+          color: #d62828;
+          text-decoration: underline;
+        }
+
+        .item-available {
+          font-size: 13px;
+          color: #777;
+        }
+
+        .item-controls {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 12px;
+        }
+
+        .qty-controls {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: white;
+          padding: 6px;
+          border-radius: 10px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .qty-btn {
+          background: #f0f0f0;
+          color: #333;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          padding: 8px;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+        }
+
+        .qty-btn:hover:not(:disabled) {
+          background: #176c3a;
+          color: white;
+          transform: scale(1.05);
+        }
+
+        .qty-btn:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .qty-display {
+          font-size: 16px;
+          font-weight: 700;
+          color: #333;
+          min-width: 35px;
+          text-align: center;
+        }
+
+        .item-pricing {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 4px;
+        }
+
+        .item-discount {
+          background: #fee;
+          color: #e63946;
+          font-size: 11px;
+          font-weight: 700;
+          padding: 3px 8px;
+          border-radius: 6px;
+        }
+
+        .item-original-price {
+          text-decoration: line-through;
+          color: #999;
+          font-size: 13px;
+        }
+
+        .item-price {
+          font-size: 20px;
+          font-weight: 700;
+          color: #176c3a;
+        }
+
+        .shipping-section {
+          margin-top: 1.5rem;
+          padding: 1.5rem;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .shipping-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .shipping-label {
+          font-size: 15px;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .progress-bar-container {
+          background: #e8eef3;
+          border-radius: 8px;
+          height: 10px;
+          width: 100%;
+          margin-bottom: 12px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .progress-bar {
+          background: linear-gradient(90deg, #176c3a 0%, #1a8447 100%);
+          height: 100%;
+          border-radius: 8px;
+          transition: width 0.5s ease;
+          position: relative;
+        }
+
+        .progress-indicator {
+          position: absolute;
+          top: 50%;
+          right: 0;
+          transform: translate(50%, -50%);
+          width: 18px;
+          height: 18px;
+          background: #176c3a;
+          border-radius: 50%;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(23, 108, 58, 0.3);
+        }
+
+        .shipping-message {
+          font-size: 13px;
+          color: #555;
+          line-height: 1.6;
+        }
+
+        .link {
+          color: #176c3a;
+          font-weight: 600;
+          text-decoration: none;
+          border-bottom: 1px solid transparent;
+          transition: border-color 0.2s ease;
+        }
+
+        .link:hover {
+          border-bottom-color: #176c3a;
+        }
+
+        .summary {
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+          padding: 2rem;
+          position: sticky;
+          top: 120px;
+          animation: fadeInUp 0.5s ease 0.2s backwards;
+        }
+
+        .summary-title {
+          font-size: 22px;
+          font-weight: 800;
+          color: #176c3a;
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 2px solid #f0f0f0;
+        }
+
+        .summary-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 15px;
+          padding: 12px 0;
+          border-bottom: 1px solid #f5f5f5;
+        }
+
+        .summary-label {
+          color: #555;
+          font-weight: 500;
+        }
+
+        .summary-value {
+          color: #176c3a;
+          font-weight: 700;
+        }
+
+        .summary-value-green {
+          color: #28a745;
+          font-weight: 700;
+        }
+
+        .coupon-section {
+          margin: 1.5rem 0;
+          text-align: center;
+        }
+
+        .coupon-link {
+          color: #176c3a;
+          font-size: 14px;
+          font-weight: 600;
+          text-decoration: none;
+          border-bottom: 2px dotted #176c3a;
+          transition: all 0.2s ease;
+        }
+
+        .coupon-link:hover {
+          color: #1a8447;
+          border-bottom-style: solid;
+        }
+
+        .total-section {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 1.5rem;
+          padding: 1.5rem;
+          background: linear-gradient(135deg, #f8fdf9 0%, #f0f8f3 100%);
+          border-radius: 12px;
+        }
+
+        .total-label {
+          font-size: 18px;
+          font-weight: 800;
+          color: #333;
+        }
+
+        .total-value {
+          font-size: 26px;
+          font-weight: 900;
+          color: #176c3a;
+        }
+
+        .checkout-btn {
+          width: 100%;
+          background: linear-gradient(135deg, #176c3a 0%, #1a8447 100%);
+          color: white;
+          padding: 16px 24px;
+          border: none;
+          border-radius: 12px;
+          cursor: pointer;
+          font-size: 17px;
+          font-weight: 700;
+          margin-top: 1rem;
+          transition: all 0.3s ease;
+          box-shadow: 0 6px 20px rgba(23, 108, 58, 0.3);
+        }
+
+        .checkout-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(23, 108, 58, 0.4);
+        }
+
+        .disclaimer-text {
+          font-size: 12px;
+          color: #999;
+          margin-top: 1rem;
+          text-align: center;
+          line-height: 1.5;
+        }
+
+        .checkout-form {
+          padding: 0;
+        }
+
+        .back-to-cart-btn {
+          background: transparent;
+          color: #176c3a;
+          padding: 10px 0;
+          border: none;
+          cursor: pointer;
+          font-size: 15px;
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 2rem;
+          transition: all 0.2s ease;
+        }
+
+        .back-to-cart-btn:hover {
+          gap: 12px;
+          color: #1a8447;
+        }
+
+        .checkout-title {
+          font-size: 32px;
+          font-weight: 800;
+          color: #176c3a;
+          margin-bottom: 8px;
+          line-height: 1.2;
+        }
+
+        .checkout-subtitle {
+          font-size: 15px;
+          color: #777;
+          margin-bottom: 2.5rem;
+        }
+
+        .form-group {
+          margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+          .form-row {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .label {
+          display: block;
+          font-size: 14px;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 8px;
+        }
+
+        .input,
+        .textarea {
+          width: 100%;
+          padding: 14px 18px;
+          font-size: 15px;
+          border: 2px solid #e0e0e0;
+          border-radius: 10px;
+          outline: none;
+          transition: all 0.3s ease;
+          font-family: inherit;
+        }
+
+        .input:focus,
+        .textarea:focus {
+          border-color: #176c3a;
+          box-shadow: 0 0 0 4px rgba(23, 108, 58, 0.1);
+        }
+
+        .textarea {
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        .confirm-btn {
+          width: 100%;
+          background: linear-gradient(135deg, #176c3a 0%, #1a8447 100%);
+          color: white;
+          padding: 18px 24px;
+          border: none;
+          border-radius: 12px;
+          cursor: pointer;
+          font-size: 17px;
+          font-weight: 700;
+          margin-top: 1rem;
+          transition: all 0.3s ease;
+          box-shadow: 0 6px 20px rgba(23, 108, 58, 0.3);
+        }
+
+        .confirm-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(23, 108, 58, 0.4);
+        }
+
+        .payment-options-container {
+          padding: 0;
+        }
+
+        .payment-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          margin-top: 2rem;
+        }
+
+        .payment-card {
+          background: white;
+          border: 2px solid #e8eef3;
+          border-radius: 12px;
+          padding: 20px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          transition: all 0.3s ease;
+        }
+
+        .payment-card:hover {
+          border-color: #176c3a;
+          box-shadow: 0 6px 20px rgba(23, 108, 58, 0.15);
+          transform: translateX(4px);
+        }
+
+        .payment-icon {
+          font-size: 36px;
+          flex-shrink: 0;
+        }
+
+        .payment-info {
+          flex: 1;
+          text-align: left;
+        }
+
+        .payment-label {
+          font-size: 16px;
+          font-weight: 700;
+          color: #333;
+          display: block;
+          margin-bottom: 4px;
+        }
+
+        .payment-subtext {
+          font-size: 13px;
+          color: #777;
+          line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+          .header-content {
+            padding: 1rem;
+          }
+
+          .logo-koxol {
+            font-size: 1.4rem;
+          }
+
+          .main-wrapper {
+            padding: 1rem;
+          }
+
+          .cart-items,
+          .summary {
+            padding: 1.5rem;
+          }
+
+          .cart-item {
+            grid-template-columns: auto 1fr;
+            gap: 12px;
+          }
+
+          .item-image {
+            width: 60px;
+            height: 60px;
+          }
+
+          .item-controls {
+            grid-column: 1 / -1;
+            flex-direction: row;
+            justify-content: space-between;
+          }
+
+          .audio-controls {
+            bottom: 20px;
+            left: 20px;
+          }
+
+          .mute-button {
+            width: 55px;
+            height: 55px;
+          }
+        }
+      `}</style>
+
+      <div className="cart-container">
+        <audio ref={audioRef} src="/musica-relajante.mp3" loop />
+
+        <PaymentModal
+          open={!!paymentModalMethod}
+          onClose={() => setPaymentModalMethod(null)}
+          method={paymentModalMethod}
+          amount={total}
+          cart={cart}
+          shippingData={shippingData}
+          onConfirm={(method) => {
+            // registrar/confirmar orden en consola/estado (no cerramos el modal aquí)
+            handleConfirmOrder(method);
+
+            // Si el método requiere pago externo (OXXO / SPEI), mostrar un modal de espera
+            if (method === 'SPEI' || method === 'OXXO') {
+              setShowAwaitingPayment(true);
+              // opcional: cerrar automáticamente el modal de espera después de unos segundos
+              setTimeout(() => setShowAwaitingPayment(false), 8000);
+            }
+            // Nota: no cerramos `paymentModalMethod` para que el modal muestre el estado de éxito
+          }}
+        />
+
+        {showAwaitingPayment && (
+          <div className="await-overlay" role="dialog" aria-modal="true">
+            <div className="await-card">
+              <header className="await-header">
+                <h3 className="await-title">Esperaremos tu pago</h3>
+                <button className="await-close" onClick={() => setShowAwaitingPayment(false)} aria-label="Cerrar">✕</button>
+              </header>
+              <div className="await-content">
+                <p className="await-body">Hemos registrado la instrucción. Esperaremos tu pago y, una vez recibido y verificado (estimado 1–3 horas), te notificaremos sobre tu pedido.</p>
+                <div className="await-actions">
+                  <button className="pm-confirm"  onClick={() => setShowAwaitingPayment(false)}>Entendido</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="audio-controls">
+          <div className="volume-slider-wrapper">
             <input
               type="range"
               min="0"
@@ -186,132 +1086,101 @@ const CartFlow = () => {
               step="0.01"
               value={volume}
               onChange={handleVolumeChange}
-              style={{ 
-                width: '100px',
-                cursor: 'pointer',
-                transform: 'rotate(-90deg)',
-                transformOrigin: 'center'
-              }}
+              className="volume-slider"
+              style={{ '--volume-percent': `${volume * 100}%` }}
               title="Ajustar volumen"
               aria-label="Control de volumen"
             />
-            <span style={{ fontSize: '12px', color: '#666', marginTop: '30px' }}>
+            <span className="volume-percent">
               {Math.round(volume * 100)}%
             </span>
           </div>
-        )}
 
-        <button 
-          onClick={toggleMute}
-          style={{ 
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            background: isMuted ? '#ccc' : '#4CAF50',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            transition: 'all 0.3s ease',
-            color: 'white'
-          }}
-          title={isMuted ? 'Activar sonido' : 'Silenciar'}
-          aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
-        >
-          {isMuted ? <FaVolumeMute size={28} /> : <FaVolumeUp size={28} />}
-        </button>
-      </div>
-
-      {/* Header */}
-      <header style={styles.header}>
-        <div style={styles.headerContent}>
-          <div style={styles.logo} onClick={() => navigate('/')}>
-            <span style={styles.logoKoxol}>K'oxol</span>
-            <span style={styles.logoSub}>Tienda Natural</span>
-          </div>
+          <button 
+            onClick={toggleMute}
+            className={`mute-button ${isMuted ? 'muted' : ''}`}
+            title={isMuted ? 'Activar sonido' : 'Silenciar'}
+            aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+          >
+            {isMuted ? <VolumeX size={28} /> : <Volume2 size={28} />}
+          </button>
         </div>
-      </header>
 
-      {/* Main Container */}
-      <div style={styles.mainWrapper}>
-        <div style={styles.mainContent}>
-          {/* Back Button */}
-          <button style={styles.backButton} onClick={() => navigate('/shop')}>
+        <header className="header">
+          <div className="header-content">
+            <div className="logo" onClick={() => navigate('/')}>
+              <span className="logo-koxol">K'oxol</span>
+              <span className="logo-sub">Tienda Natural</span>
+            </div>
+          </div>
+        </header>
+
+        <div className="main-wrapper">
+          <button className="back-button" onClick={() => navigate('/shop')}>
             <ArrowLeft size={20} />
             <span>Seguir comprando</span>
           </button>
 
-          {/* Cart Content */}
-          <div style={styles.cartLayout}>
-            {/* Left Side - Cart Items, Checkout Form, or Payment Options */}
-            <div style={styles.cartItems}>
+          <div className="cart-layout">
+            <div className="cart-items">
               {!showCheckout ? (
-                /* VISTA 1: CARRITO */
                 <>
-                  <div style={styles.section}>
-                    <div style={styles.sectionHeader}>
-                      <input type="checkbox" style={styles.checkbox} defaultChecked />
-                      <span style={styles.sectionTitle}>Todos los productos</span>
+                  <div className="section">
+                    <div className="section-header">
+                      <input type="checkbox" className="checkbox" defaultChecked />
+                      <span className="section-title">Todos los productos</span>
                     </div>
                   </div>
 
-                  <div style={styles.section}>
-                    <div style={styles.sectionHeader}>
-                      <input type="checkbox" style={styles.checkbox} defaultChecked />
-                      <span style={styles.sectionTitle}>Productos K'oxol</span>
-                      <span style={styles.fullBadge}>FULL</span>
+                  <div className="section">
+                    <div className="section-header">
+                      <input type="checkbox" className="checkbox" defaultChecked />
+                      <span className="section-title">Productos K'oxol</span>
+                      <span className="full-badge">FULL</span>
                     </div>
 
                     {cart.map((item, index) => (
                       <div key={item.id}>
-                        <div style={styles.cartItem}>
-                          <input type="checkbox" style={styles.checkbox} defaultChecked />
-                          <img src={item.image} alt={item.name} style={styles.itemImage} />
-                          <div style={styles.itemDetails}>
-                            <h3 style={styles.itemName}>{item.name}</h3>
-                            <button style={styles.removeBtn} onClick={() => removeItem(item.id)}>
+                        <div className="cart-item">
+                          <input type="checkbox" className="checkbox" defaultChecked />
+                          <img src={item.image} alt={item.name} className="item-image" />
+                          <div className="item-details">
+                            <h3 className="item-name">{item.name}</h3>
+                            <button className="remove-btn" onClick={() => removeItem(item.id)}>
                               Eliminar
                             </button>
-                            <p style={styles.itemAvailable}>{item.available} disponibles</p>
+                            <p className="item-available">{item.available} disponibles</p>
                           </div>
-                          <div style={styles.itemControls}>
-                            <div style={styles.qtyControls}>
+                          <div className="item-controls">
+                            <div className="qty-controls">
                               <button
-                                style={{
-                                  ...styles.qtyBtn,
-                                  ...(item.qty <= 1 && { opacity: 0.4, cursor: 'not-allowed' })
-                                }}
+                                className="qty-btn"
                                 onClick={() => updateQty(item.id, -1)}
                                 disabled={item.qty <= 1}
                               >
                                 <Minus size={14} />
                               </button>
-                              <span style={styles.qtyDisplay}>{item.qty}</span>
+                              <span className="qty-display">{item.qty}</span>
                               <button
-                                style={{
-                                  ...styles.qtyBtn,
-                                  ...(item.qty >= (item.available || 999) && { opacity: 0.4, cursor: 'not-allowed' })
-                                }}
+                                className="qty-btn"
                                 onClick={() => updateQty(item.id, 1)}
                                 disabled={item.qty >= (item.available || 999)}
                               >
                                 <Plus size={14} />
                               </button>
                             </div>
-                            <div style={styles.itemPricing}>
+                            <div className="item-pricing">
                               {item.originalPrice > item.price && (
-                                <span style={styles.itemDiscount}>
+                                <span className="item-discount">
                                   -{Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}%
                                 </span>
                               )}
                               {item.originalPrice > item.price && (
-                                <span style={styles.itemOriginalPrice}>
+                                <span className="item-original-price">
                                   ${item.originalPrice.toFixed(2)}
                                 </span>
                               )}
-                              <span style={styles.itemPrice}>
+                              <span className="item-price">
                                 ${(item.price * item.qty).toFixed(2)}
                               </span>
                             </div>
@@ -319,41 +1188,33 @@ const CartFlow = () => {
                         </div>
 
                         {index === cart.length - 1 && (
-                          <div style={styles.shippingSection}>
-                            <div style={styles.shippingHeader}>
-                              <span style={styles.shippingLabel}>Envío</span>
+                          <div className="shipping-section">
+                            <div className="shipping-header">
+                              <span className="shipping-label">Envío</span>
                               <span style={{
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                color: shipping === 0 ? '#176c3a' : '#e63946'
+                                fontSize: '15px',
+                                fontWeight: '700',
+                                color: shipping === 0 ? '#28a745' : '#e63946'
                               }}>
-                                {shipping === 0 ? 'Gratis' : `$${shipping.toFixed(2)}`}
+                                {shipping === 0 ? 'Gratis' : `${shipping.toFixed(2)}`}
                               </span>
                             </div>
-                            <div style={styles.progressBarContainer}>
-                              <div style={{
-                                backgroundColor: '#176c3a',
-                                height: '100%',
-                                borderRadius: '4px',
-                                width: `${Math.min((subtotal / 500) * 100, 100)}%`
-                              }}></div>
-                              <div style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: `${Math.min((subtotal / 500) * 100, 100)}%`,
-                                transform: 'translate(-50%, -50%)',
-                                width: '16px',
-                                height: '16px',
-                                backgroundColor: '#176c3a',
-                                borderRadius: '50%'
-                              }}></div>
+                            <div className="progress-bar-container">
+                              <div 
+                                className="progress-bar"
+                                style={{
+                                  width: `${Math.min((subtotal / 500) * 100, 100)}%`
+                                }}
+                              >
+                                <div className="progress-indicator"></div>
+                              </div>
                             </div>
-                            <p style={styles.shippingMessage}>
+                            <p className="shipping-message">
                               {subtotal >= 500 
                                 ? '¡Felicidades! Tu envío es gratis.'
-                                : `Agrega $${(500 - subtotal).toFixed(2)} más para obtener envío gratis.`
+                                : `Agrega ${(500 - subtotal).toFixed(2)} más para obtener envío gratis.`
                               }{' '}
-                              <a href="#" style={styles.link}>Ver productos</a>
+                              <a href="#" className="link">Ver productos</a>
                             </p>
                           </div>
                         )}
@@ -362,633 +1223,209 @@ const CartFlow = () => {
                   </div>
                 </>
               ) : showPaymentOptions ? (
-                /* VISTA 3: MÉTODOS DE PAGO */
-                <div style={styles.paymentOptionsContainer}>
-                  <button style={styles.backToCartBtn} onClick={handleBackToShipping}>
+                <div className="payment-options-container">
+                  <button className="back-to-cart-btn" onClick={handleBackToShipping}>
                     <ArrowLeft size={16} />
                     <span>Volver a datos de envío</span>
                   </button>
                   
-                  <h2 style={styles.checkoutTitle}>Método de pago</h2>
-                  <p style={styles.checkoutSubtitle}>Selecciona cómo deseas pagar tu pedido</p>
+                  <h2 className="checkout-title">Método de pago</h2>
+                  <p className="checkout-subtitle">Selecciona cómo deseas pagar tu pedido</p>
                   
-                  <div style={styles.paymentGrid}>
-                    <button style={styles.paymentCard} onClick={() => handleConfirmOrder('Tarjeta de crédito/débito')}>
-                      <div style={styles.paymentIcon}>💳</div>
-                      <span style={styles.paymentLabel}>Tarjeta de crédito/débito</span>
-                      <span style={styles.paymentSubtext}>Visa, Mastercard, American Express</span>
+                  <div className="payment-grid">
+                    <button className="payment-card" onClick={() => setPaymentModalMethod('Tarjeta de crédito/débito')}>
+                      <div className="payment-icon">💳</div>
+                      <div className="payment-info">
+                        <span className="payment-label">Tarjeta de crédito/débito</span>
+                        <span className="payment-subtext">Visa, Mastercard, American Express</span>
+                      </div>
                     </button>
 
-                    <button style={styles.paymentCard} onClick={() => handleConfirmOrder('OXXO')}>
-                      <div style={styles.paymentIcon}>🏪</div>
-                      <span style={styles.paymentLabel}>OXXO</span>
-                      <span style={styles.paymentSubtext}>Paga en efectivo en tiendas OXXO</span>
+                    <button className="payment-card" onClick={() => setPaymentModalMethod('OXXO')}>
+                      <div className="payment-icon">🏪</div>
+                      <div className="payment-info">
+                        <span className="payment-label">OXXO</span>
+                        <span className="payment-subtext">Paga en efectivo en tiendas OXXO</span>
+                      </div>
                     </button>
 
-                    <button style={styles.paymentCard} onClick={() => handleConfirmOrder('SPEI')}>
-                      <div style={styles.paymentIcon}>🏦</div>
-                      <span style={styles.paymentLabel}>Transferencia SPEI</span>
-                      <span style={styles.paymentSubtext}>Transferencia bancaria instantánea</span>
+                    <button className="payment-card" onClick={() => setPaymentModalMethod('SPEI')}>
+                      <div className="payment-icon">🏦</div>
+                      <div className="payment-info">
+                        <span className="payment-label">Transferencia SPEI</span>
+                        <span className="payment-subtext">Transferencia bancaria instantánea</span>
+                      </div>
                     </button>
 
-                    <button style={styles.paymentCard} onClick={() => handleConfirmOrder('Mercado Pago')}>
-                      <div style={styles.paymentIcon}>💰</div>
-                      <span style={styles.paymentLabel}>Mercado Pago</span>
-                      <span style={styles.paymentSubtext}>Paga con tu cuenta de Mercado Pago</span>
+                    <button className="payment-card" onClick={() => setPaymentModalMethod('Mercado Pago')}>
+                      <div className="payment-icon">💰</div>
+                      <div className="payment-info">
+                        <span className="payment-label">Mercado Pago</span>
+                        <span className="payment-subtext">Paga con tu cuenta de Mercado Pago</span>
+                      </div>
                     </button>
 
-                    <button style={styles.paymentCard} onClick={() => handleConfirmOrder('PayPal')}>
-                      <div style={styles.paymentIcon}>🅿️</div>
-                      <span style={styles.paymentLabel}>PayPal</span>
-                      <span style={styles.paymentSubtext}>Paga con tu cuenta de PayPal</span>
-                    </button>
+                    {/* PayPal option removed per request */}
                   </div>
                 </div>
               ) : (
-                /* VISTA 2: FORMULARIO DE DATOS DE ENVÍO */
-                <div style={styles.checkoutForm}>
-                  <button style={styles.backToCartBtn} onClick={handleBackToCart}>
+                <div className="checkout-form">
+                  <button className="back-to-cart-btn" onClick={handleBackToCart}>
                     <ArrowLeft size={16} />
                     <span>Volver al carrito</span>
                   </button>
                   
-                  <h2 style={styles.checkoutTitle}>Datos de envío</h2>
-                  <p style={styles.checkoutSubtitle}>Complete la información para finalizar su compra</p>
+                  <h2 className="checkout-title">Datos de envío</h2>
+                  <p className="checkout-subtitle">Complete la información para finalizar su compra</p>
                   
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Nombre completo *</label>
+                  <div className="form-group">
+                    <label className="label">Nombre completo *</label>
                     <input
                       type="text"
                       name="fullName"
                       value={shippingData.fullName}
                       onChange={handleInputChange}
-                      style={styles.input}
+                      className="input"
                       placeholder="Ej: Juan Pérez García"
                       required
                     />
                   </div>
 
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Dirección completa *</label>
+                  <div className="form-group">
+                    <label className="label">Dirección completa *</label>
                     <input
                       type="text"
                       name="address"
                       value={shippingData.address}
                       onChange={handleInputChange}
-                      style={styles.input}
+                      className="input"
                       placeholder="Calle, número, colonia"
                       required
                     />
                   </div>
 
-                  <div style={styles.formRow}>
-                    <div style={styles.formGroupHalf}>
-                      <label style={styles.label}>Código Postal *</label>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label className="label">Código Postal *</label>
                       <input
                         type="text"
                         name="zipCode"
                         value={shippingData.zipCode}
                         onChange={handleInputChange}
-                        style={styles.input}
+                        className="input"
                         placeholder="29000"
                         maxLength="5"
                         required
                       />
                     </div>
 
-                    <div style={styles.formGroupHalf}>
-                      <label style={styles.label}>Número exterior *</label>
+                    <div className="form-group">
+                      <label className="label">Número exterior *</label>
                       <input
                         type="text"
                         name="houseNumber"
                         value={shippingData.houseNumber}
                         onChange={handleInputChange}
-                        style={styles.input}
+                        className="input"
                         placeholder="123"
                         required
                       />
                     </div>
                   </div>
 
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Referencia (opcional)</label>
+                  <div className="form-group">
+                    <label className="label">Referencia (opcional)</label>
                     <textarea
                       name="reference"
                       value={shippingData.reference}
                       onChange={handleInputChange}
-                      style={styles.textarea}
+                      className="textarea"
                       placeholder="Entre qué calles, color de casa, puntos de referencia..."
                       rows="3"
                     />
                   </div>
 
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Teléfono *</label>
+                  <div className="form-group">
+                    <label className="label">Teléfono *</label>
                     <input
                       type="tel"
                       name="phone"
                       value={shippingData.phone}
                       onChange={handleInputChange}
-                      style={styles.input}
+                      className="input"
                       placeholder="9611234567"
                       maxLength="10"
                       required
                     />
                   </div>
 
-                  <button style={styles.confirmBtn} onClick={handleProceedToPayment}>
+                  <button className="confirm-btn" onClick={handleProceedToPayment}>
                     Siguiente - Seleccionar forma de pago
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Right Side - Order Summary */}
-            <div style={styles.summary}>
-              <div style={styles.summaryCard}>
-                <h2 style={styles.summaryTitle}>Resumen de compra</h2>
+            <div className="summary">
+              <h2 className="summary-title">Resumen de compra</h2>
 
-                <div style={styles.summaryRow}>
-                  <span style={styles.summaryLabel}>
-                    Productos ({cart.reduce((acc, item) => acc + item.qty, 0)})
-                  </span>
-                  <span style={styles.summaryValue}>
-                    ${subtotal.toFixed(2)}
-                  </span>
-                </div>
-
-                <div style={styles.summaryRow}>
-                  <span style={styles.summaryLabel}>
-                    Envío
-                  </span>
-                  <span style={shipping === 0 ? styles.summaryValueGreen : styles.summaryValue}>
-                    {shipping === 0 ? 'Gratis' : `$${shipping.toFixed(2)}`}
-                  </span>
-                </div>
-
-                {savings > 0 && (
-                  <div style={styles.summaryRow}>
-                    <span style={styles.summaryLabel}>
-                      Costos de descuento estimados
-                    </span>
-                    <span style={styles.summaryValueGreen}>
-                      -${savings.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-
-                <div style={styles.couponSection}>
-                  <a href="#" style={styles.couponLink}>Ingresar código de cupón</a>
-                </div>
-
-                <div style={styles.totalSection}>
-                  <span style={styles.totalLabel}>Total</span>
-                  <span style={styles.totalValue}>${total.toFixed(2)}</span>
-                </div>
-
-                {!showCheckout && (
-                  <button style={styles.checkoutBtn} onClick={() => setShowCheckout(true)}>
-                    Continuar compra
-                  </button>
-                )}
-
-                {showCheckout && !showPaymentOptions && (
-                  <button style={styles.checkoutBtn} onClick={handleProceedToPayment}>
-                    Proceder al pago
-                  </button>
-                )}
-
-                <p style={styles.disclaimerText}>
-                  Verás el costo de envío e impuestos al finalizar tu compra
-                </p>
+              <div className="summary-row">
+                <span className="summary-label">
+                  Productos ({cart.reduce((acc, item) => acc + item.qty, 0)})
+                </span>
+                <span className="summary-value">
+                  ${subtotal.toFixed(2)}
+                </span>
               </div>
+
+              <div className="summary-row">
+                <span className="summary-label">Envío</span>
+                <span className={shipping === 0 ? 'summary-value-green' : 'summary-value'}>
+                  {shipping === 0 ? 'Gratis' : `${shipping.toFixed(2)}`}
+                </span>
+              </div>
+
+              {savings > 0 && (
+                <div className="summary-row">
+                  <span className="summary-label">
+                    Costos de descuento estimados
+                  </span>
+                  <span className="summary-value-green">
+                    -${savings.toFixed(2)}
+                  </span>
+                </div>
+              )}
+
+              <div className="coupon-section">
+                <a href="#" className="coupon-link">Ingresar código de cupón</a>
+              </div>
+
+              <div className="total-section">
+                <span className="total-label">Total</span>
+                <span className="total-value">${total.toFixed(2)}</span>
+              </div>
+
+              {!showCheckout && (
+                <button className="checkout-btn" onClick={() => setShowCheckout(true)}>
+                  Continuar compra
+                </button>
+              )}
+
+              {showCheckout && !showPaymentOptions && (
+                <button className="checkout-btn" onClick={handleProceedToPayment}>
+                  Proceder al pago
+                </button>
+              )}
+
+              <p className="disclaimer-text">
+                Verás el costo de envío e impuestos al finalizar tu compra
+              </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-};
-
-const styles = {
-  container: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif',
-    backgroundColor: '#ebebeb',
-    minHeight: '100vh',
-    margin: 0,
-    padding: 0,
-    boxSizing: 'border-box',
-    width: '100vw',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-  },
-  header: {
-    background: '#fff',
-    borderBottom: '1px solid #e0e0e0',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-    boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
-    width: '100%',
-    boxSizing: 'border-box',
-  },
-  headerContent: {
-    margin: 0,
-    padding: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  logo: {
-    fontSize: '1.5rem',
-    fontWeight: 800,
-    color: '#176c3a',
-    minWidth: 140,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 6,
-  },
-  logoKoxol: {
-    color: '#176c3a',
-    fontWeight: 900,
-  },
-  logoSub: {
-    color: '#169c7c',
-    fontWeight: 600,
-  },
-  mainWrapper: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#ebebeb',
-    padding: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  mainContent: {
-    flex: 1,
-    width: '100%',
-    padding: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-  },
-  backButton: {
-    backgroundColor: '#f0f0f0',
-    color: '#333',
-    padding: '10px 20px',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '5px',
-  },
-  cartLayout: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: '20px',
-    width: '100%',
-  },
-  cartItems: {
-    backgroundColor: '#ffffff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-    padding: '20px',
-    marginLeft: 'auto',
-    marginRight: '0',
-    maxWidth: '800px',
-  },
-  section: {
-    marginBottom: '20px',
-  },
-  sectionHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '10px',
-  },
-  checkbox: {
-    marginRight: '10px',
-  },
-  sectionTitle: {
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#333',
-  },
-  fullBadge: {
-    backgroundColor: '#176c3a',
-    color: 'white',
-    borderRadius: '12px',
-    padding: '2px 8px',
-    fontSize: '12px',
-  },
-  cartItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '15px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '8px',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-    marginBottom: '10px',
-    marginLeft: '50px',
-  },
-  itemImage: {
-    width: '60px',
-    height: '60px',
-    borderRadius: '4px',
-    objectFit: 'cover',
-    marginRight: '10px',
-  },
-  itemDetails: {
-    flex: 1,
-  },
-  itemName: {
-    fontSize: '14px',
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: '5px',
-  },
-  removeBtn: {
-    backgroundColor: 'transparent',
-    color: '#e63946',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '12px',
-    marginBottom: '5px',
-  },
-  itemAvailable: {
-    fontSize: '12px',
-    color: '#777',
-  },
-  itemControls: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  qtyControls: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  qtyBtn: {
-    backgroundColor: '#f0f0f0',
-    color: '#333',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    padding: '5px 10px',
-    fontSize: '14px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: '30px',
-    height: '30px',
-    transition: 'all 0.2s ease',
-  },
-  qtyDisplay: {
-    fontSize: '14px',
-    color: '#333',
-    margin: '0 10px',
-  },
-  itemPricing: {
-    textAlign: 'right',
-  },
-  itemDiscount: {
-    color: '#e63946',
-    fontSize: '12px',
-    marginRight: '5px',
-  },
-  itemOriginalPrice: {
-    textDecoration: 'line-through',
-    color: '#777',
-    fontSize: '12px',
-    marginRight: '5px',
-  },
-  itemPrice: {
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#176c3a',
-  },
-  shippingSection: {
-    marginTop: '10px',
-    paddingTop: '10px',
-    borderTop: '1px solid #e0e0e0',
-  },
-  shippingHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '10px',
-  },
-  shippingLabel: {
-    fontSize: '14px',
-    color: '#333',
-  },
-  progressBarContainer: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: '4px',
-    height: '8px',
-    width: '100%',
-    marginBottom: '10px',
-    position: 'relative',
-  },
-  shippingMessage: {
-    fontSize: '12px',
-    color: '#333',
-  },
-  link: {
-    color: '#176c3a',
-    textDecoration: 'underline',
-  },
-  summary: {
-    backgroundColor: '#ffffff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-    padding: '20px',
-    marginLeft: 'auto',
-    marginRight: '3rem',
-    maxWidth: '400px',
-  },
-  summaryCard: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  summaryTitle: {
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#176c3a',
-    marginBottom: '15px',
-  },
-  summaryRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '14px',
-    color: '#333',
-    marginBottom: '10px',
-  },
-  summaryLabel: {
-    color: '#333',
-  },
-  summaryValue: {
-    color: '#176c3a',
-    fontWeight: '500',
-  },
-  summaryValueGreen: {
-    color: '#28a745',
-    fontWeight: '500',
-  },
-  couponSection: {
-    margin: '10px 0',
-  },
-  couponLink: {
-    color: '#176c3a',
-    textDecoration: 'underline',
-    fontSize: '14px',
-  },
-  totalSection: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '15px',
-  },
-  totalLabel: {
-    fontSize: '16px',
-    fontWeight: '700',
-    color: '#333',
-  },
-  totalValue: {
-    fontSize: '18px',
-    fontWeight: '700',
-    color: '#176c3a',
-  },
-  checkoutBtn: {
-    backgroundColor: '#176c3a',
-    color: 'white',
-    padding: '12px 24px',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: '600',
-    marginTop: '10px',
-  },
-  disclaimerText: {
-    fontSize: '12px',
-    color: '#777',
-    marginTop: '10px',
-    textAlign: 'center',
-  },
-  checkoutForm: {
-    padding: '20px',
-  },
-  backToCartBtn: {
-    backgroundColor: 'transparent',
-    color: '#176c3a',
-    padding: '8px 0',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '14px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '20px',
-    fontWeight: '500',
-  },
-  checkoutTitle: {
-    fontSize: '28px',
-    fontWeight: '700',
-    color: '#176c3a',
-    marginBottom: '8px',
-  },
-  checkoutSubtitle: {
-    fontSize: '14px',
-    color: '#777',
-    marginBottom: '30px',
-  },
-  formGroup: {
-    marginBottom: '20px',
-  },
-  formGroupHalf: {
-    flex: 1,
-  },
-  formRow: {
-    display: 'flex',
-    gap: '15px',
-  },
-  label: {
-    display: 'block',
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: '8px',
-  },
-  input: {
-    width: '100%',
-    padding: '12px 16px',
-    fontSize: '14px',
-    border: '1px solid #e0e0e0',
-    borderRadius: '6px',
-    boxSizing: 'border-box',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-  },
-  confirmBtn: {
-    width: '100%',
-    backgroundColor: '#176c3a',
-    color: 'white',
-    padding: '16px 24px',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: '600',
-    marginTop: '10px',
-  },
-  paymentOptionsContainer: {
-    padding: '20px',
-    maxHeight: '600px',
-    overflowY: 'auto',
-  },
-  paymentGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr',
-    gap: '12px',
-    marginTop: '20px',
-  },
-  paymentCard: {
-    backgroundColor: '#ffffff',
-    border: '2px solid #e0e0e0',
-    borderRadius: '8px',
-    padding: '16px',
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    textAlign: 'left',
-    gap: '15px',
-    transition: 'all 0.3s ease',
-    minHeight: 'auto',
-  },
-  paymentIcon: {
-    fontSize: '32px',
-    flexShrink: 0,
-  },
-  paymentLabel: {
-    fontSize: '15px',
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: '4px',
-    display: 'block',
-  },
-  paymentSubtext: {
-    fontSize: '12px',
-    color: '#777',
-    lineHeight: '1.4',
-    display: 'block',
-  },
 };
 
 export default CartFlow;

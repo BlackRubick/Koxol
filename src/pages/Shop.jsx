@@ -6,8 +6,8 @@ import products from '../data/products';
 import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
 import ChatbotButton from '../components/atoms/ChatbotButton';
 import ChatMessenger from '../components/atoms/ChatMessenger';
-import ProductCard from '../components/atoms/ProductCard'; // Import ProductCard
-import Modal from '../components/atoms/Modal'; // Import Modal component
+import ProductCard from '../components/atoms/ProductCard'; 
+import Modal from '../components/atoms/Modal'; 
 
 const Shop = () => {
 	const navigate = useNavigate();

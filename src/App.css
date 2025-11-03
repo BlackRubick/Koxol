@@ -1,9 +1,9 @@
 /* Paleta de colores */
 :root {
-  --forest-green: #2E4600;
-  --grass: #486B00;
-  --lime: #A2C523;
-  --earth: #7D4427;
+    --forest-green: #2E4600;
+    --grass: #486B00;
+    --lime: #A2C523;
+    --earth: #7D4427;
 }
 
 /* Reset y configuración base */
