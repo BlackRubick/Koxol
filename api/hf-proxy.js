@@ -33,8 +33,11 @@ export default async function handler(req, res) {
       return;
     }
 
-    // Llamada al Hugging Face Router (v1)
-    const hfRes = await fetch(`https://api-inference.huggingface.co/models/${HF_MODEL}`, {
+    // Llamada al nuevo Hugging Face Router
+    // Nota: la API clásica api-inference.huggingface.co está deprecada y devuelve 410.
+    // Usamos el nuevo endpoint router.huggingface.co/hf-inference/{model}
+    const routerUrl = `https://router.huggingface.co/hf-inference/${HF_MODEL}`;
+    const hfRes = await fetch(routerUrl, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${HF_TOKEN}`,
@@ -58,8 +61,18 @@ export default async function handler(req, res) {
         res.status(200).send(text);
       }
     } else {
-      // Error desde HF
-      res.status(hfRes.status).send(text);
+      // Error desde HF (reenvía el status y el cuerpo). Para 410 devolvemos una nota más clara.
+      if (hfRes.status === 410) {
+        res.status(410).json({ error: 'https://api-inference.huggingface.co is no longer supported. Please use https://router.huggingface.co/hf-inference instead.' });
+      } else {
+        // Reenvía body sin intentar parsear si no es JSON
+        try {
+          const maybeJson = JSON.parse(text);
+          res.status(hfRes.status).json(maybeJson);
+        } catch (e) {
+          res.status(hfRes.status).send(text);
+        }
+      }
     }
   } catch (err) {
     console.error('hf-proxy error:', err);

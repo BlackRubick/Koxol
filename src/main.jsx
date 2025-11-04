@@ -22,7 +22,8 @@ createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<App />} />
+            {/* Use a wildcard for the App route so nested Routes inside App render correctly */}
+            <Route path="*" element={<App />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/admin/orders" element={<AdminOrders />} />
             <Route path="/shop/*" element={<Shop />} />
