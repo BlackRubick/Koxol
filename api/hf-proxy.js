@@ -63,6 +63,8 @@ export default async function handler(req, res) {
     // Nota: la API clásica api-inference.huggingface.co está deprecada y devuelve 410.
     // Usamos el nuevo endpoint router.huggingface.co/hf-inference/{model}
     const routerUrl = `https://router.huggingface.co/hf-inference/${HF_MODEL}`;
+    // Log router call (do NOT log HF_TOKEN)
+    console.log('hf-proxy: calling HF router', { routerUrl, model: HF_MODEL, payloadPreview: typeof payload === 'string' ? payload.slice(0,200) : JSON.stringify(payload).slice(0,200) });
     const hfRes = await fetch(routerUrl, {
       method: 'POST',
       headers: {
@@ -71,9 +73,10 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify(payload)
     });
-
     const text = await hfRes.text();
     const contentType = hfRes.headers.get('content-type') || '';
+    // Log HF response status and a short preview of the body to help debugging (no secrets)
+    console.log('hf-proxy: hfRes', { status: hfRes.status, contentType, bodyPreview: text ? text.slice(0,400) : '' });
 
     // Reenvía el código de estado y el cuerpo devuelto por HF
     if (hfRes.ok) {
