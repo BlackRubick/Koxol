@@ -6,11 +6,14 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Log request method and url for easier debugging in Vercel logs
+  console.log('hf-proxy invoked:', { method: req.method, url: req.url, headers: req.headers });
+
   // Este endpoint actúa como proxy a Hugging Face Router para ocultar la clave en producción.
   // Requisitos: configurar HF_TOKEN y HF_MODEL en las variables de entorno del servidor (ej. Vercel).
 
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
+    res.status(405).json({ error: 'Method not allowed', method: req.method });
     return;
   }
 
@@ -23,7 +26,23 @@ export default async function handler(req, res) {
       return;
     }
 
-    const body = req.body;
+    // Some runtimes provide parsed req.body; as a fallback, read the raw body stream.
+    let body = req.body;
+    if (!body || (typeof body === 'object' && Object.keys(body).length === 0)) {
+      try {
+        const raw = await new Promise((resolve, reject) => {
+          let data = '';
+          req.on('data', chunk => { data += chunk.toString(); });
+          req.on('end', () => resolve(data));
+          req.on('error', err => reject(err));
+        });
+        if (raw) {
+          try { body = JSON.parse(raw); } catch (e) { body = { raw }; }
+        }
+      } catch (e) {
+        console.warn('hf-proxy: could not read raw body', e);
+      }
+    }
 
     // Soportamos dos formatos desde el frontend: { prompt } o { messages }
     let payload;
