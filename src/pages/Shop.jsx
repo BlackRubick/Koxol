@@ -3,8 +3,9 @@ import { ShoppingCart, Search, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import products from '../data/products';
-import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+// Inline SVGs are used for volume icons to ensure consistent rendering across devices
 import ChatbotButton from '../components/atoms/ChatbotButton';
+import Fab from '../components/atoms/Fab';
 import ChatMessenger from '../components/atoms/ChatMessenger';
 import ProductCard from '../components/atoms/ProductCard'; 
 import Modal from '../components/atoms/Modal'; 
@@ -224,72 +225,68 @@ const Shop = () => {
 
 			<audio ref={audioRef} src="/musica-relajante.mp3" loop />
 
-			<div 
-				onMouseEnter={() => setShowVolumeSlider(true)}
-				onMouseLeave={() => setShowVolumeSlider(false)}
-				style={{ 
-					position: 'fixed', 
-					bottom: '40px', 
-					left: '20px', 
-					zIndex: 1000,
-					display: 'flex',
-					flexDirection: 'column',
-					alignItems: 'center',
-					gap: '10px'
-				}}
-			>
-				{showVolumeSlider && (
-					<div style={{
-						padding: '0',
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'center',
-						gap: '10px',
-						marginBottom: '10px'
-					}}>
-						<input
-							type="range"
-							min="0"
-							max="1"
-							step="0.01"
-							value={volume}
-							onChange={handleVolumeChange}
-							style={{ 
-								width: '100px',
-								cursor: 'pointer',
-								transform: 'rotate(-90deg)',
-								transformOrigin: 'center'
-							}}
-							title="Ajustar volumen"
-							aria-label="Control de volumen"
-						/>
-						<span style={{ fontSize: '12px', color: '#666', marginTop: '30px' }}>
-							{Math.round(volume * 100)}%
-						</span>
-					</div>
-				)}
-
-				<button 
-					onClick={toggleMute}
-					style={{ 
-						width: '60px',
-						height: '60px',
-						borderRadius: '50%',
-						background: isMuted ? '#ccc' : '#4CAF50',
-						border: 'none',
-						cursor: 'pointer',
+			{/* Volume slider popup (absolutely positioned) */}
+			{showVolumeSlider && (
+				<div
+					style={{
+						position: 'fixed',
+						bottom: '100px',
+						left: '20px',
+						zIndex: 1100,
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
-						boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-						transition: 'all 0.3s ease',
-						color: 'white'
+						padding: 0,
+						pointerEvents: 'auto'
 					}}
-					title={isMuted ? 'Activar sonido' : 'Silenciar'}
-					aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
 				>
-					{isMuted ? <FaVolumeMute size={28} /> : <FaVolumeUp size={28} />}
-				</button>
+					<input
+						type="range"
+						min="0"
+						max="1"
+						step="0.01"
+						value={volume}
+						onChange={handleVolumeChange}
+						style={{
+							width: '100px',
+							cursor: 'pointer',
+							transform: 'rotate(-90deg)',
+							transformOrigin: 'center'
+						}}
+						title="Ajustar volumen"
+						aria-label="Control de volumen"
+					/>
+					<span style={{ fontSize: '12px', color: '#666', marginTop: '8px', marginLeft: '8px' }}>
+						{Math.round(volume * 100)}%
+					</span>
+				</div>
+			)}
+
+			{/* Audio FAB (separado del popup para evitar herencias de layout) */}
+			<div style={{ position: 'fixed', bottom: '40px', left: '20px', zIndex: 1000 }}>
+				<Fab
+					className="audio-fab"
+					onClick={(e) => {
+						if (isMobile) {
+							setShowVolumeSlider(s => !s);
+						} else {
+							toggleMute();
+						}
+					}}
+					size={60}
+					ariaLabel={isMuted ? 'Activar sonido' : 'Silenciar'}
+				>
+					{/* Inline SVG icons: muted and volume */}
+					{isMuted ? (
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<path fill="#fff" d="M16.5 12l3.5 3.5-1.5 1.5L15 13.5v3.5H9V7h6v3.5l3.5-3.5L20 9.5 16.5 13zM7 9v6h4l5 4V5L11 9H7z" />
+						</svg>
+					) : (
+						<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<path fill="#fff" d="M7 9v6h4l5 4V5l-5 4H7zM16.5 12c0-1.77-.77-3.36-2-4.44v8.88c1.23-1.08 2-2.67 2-4.44zM18.5 12c0 2.5-1.12 4.72-2.9 6.2l1.4 1.4C19.2 18.7 20.5 15.6 20.5 12s-1.3-6.7-3.5-8.6l-1.4 1.4C17.4 7.3 18.5 9.4 18.5 12z" />
+						</svg>
+					)}
+				</Fab>
 			</div>
 
 			{/* Botón del chatbot */}

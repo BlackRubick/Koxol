@@ -293,9 +293,14 @@ function App() {
         {/* Botón circular de volumen */}
         <button 
           onClick={toggleMute}
+          className="audio-fab"
           style={{ 
             width: '60px',
             height: '60px',
+            minWidth: '60px',
+            minHeight: '60px',
+            padding: 0,
+            boxSizing: 'border-box',
             borderRadius: '50%',
             background: isMuted ? '#ccc' : '#4CAF50',
             border: 'none',
@@ -305,7 +310,8 @@ function App() {
             justifyContent: 'center',
             boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
             transition: 'all 0.3s ease',
-            color: 'white'
+            color: 'white',
+            overflow: 'hidden'
           }}
           title={isMuted ? 'Activar sonido' : 'Silenciar'}
           aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}

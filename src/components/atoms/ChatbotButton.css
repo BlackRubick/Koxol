@@ -1,8 +1,12 @@
 /* Botón flotante para chatbot */
 .chatbot-fab {
+  /* El valor por defecto ahora vive en :root, y puedes sobrescribirlo globalmente.
+    - Para mover el botón hacia la izquierda incrementa --chatbot-right (ej. 4.2em)
+    - Para moverlo a la derecha disminúyelo (ej. 1.2em)
+    Si no se define --chatbot-right, usamos 2.6em como fallback. */
   position: fixed;
-  bottom: 2.2em;
-  right: 2.2em;
+  bottom: 40px; /* alineado con el botón de sonido */
+  right: var(--chatbot-right, 2.6em);
   z-index: 9999;
   width: 64px;
   height: 64px;
@@ -13,10 +17,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0; /* override global button padding */
+  box-sizing: border-box; /* ensure padding/border don't change size */
   cursor: pointer;
   transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
   animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
-  font-size: 2rem; /* Tamaño grande para el emoji */
+  font-size: 0; /* hide any fallback text (emoji) - we use SVG icon */
 }
 .chatbot-fab:hover {
   background: #45A049; /* Color verde más oscuro al pasar el cursor */
@@ -28,11 +34,43 @@
   .chatbot-fab {
     width: 52px;
     height: 52px;
-    bottom: 1.2em;
-    right: 1.2em;
+    bottom: 40px; /* mantener mismo bottom que el botón de audio en móvil */
+    /* En móvil puedes usar otra variable si quieres un offset distinto: --chatbot-right-mobile */
+    right: var(--chatbot-right-mobile, calc(var(--chatbot-right) / 1.6));
     border-radius: 50%; /* Garantizar forma perfectamente circular */
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0; /* override global button padding on small screens */
+    box-sizing: border-box;
   }
+}
+
+/* Force exact circular shape even if global button rules exist */
+.chatbot-fab, .audio-fab {
+  width: 64px !important;
+  height: 64px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  border-radius: 50% !important;
+  line-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+@media (max-width: 600px) {
+  .chatbot-fab, .audio-fab {
+    width: 52px !important;
+    height: 52px !important;
+  }
+
+/* SVG sizing inside the fab */
+.chatbot-fab svg,
+.audio-fab svg {
+  width: 56%;
+  height: 56%;
+  display: block;
+}
 }

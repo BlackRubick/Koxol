@@ -4,6 +4,9 @@
     --grass: #486B00;
     --lime: #A2C523;
     --earth: #7D4427;
+  /* Layout variables for floating action buttons */
+  --chatbot-right: 24px; /* distance from right edge for chatbot button (change this to move it) */
+  --chatbot-right-mobile: 16px; /* mobile distance fallback */
 }
 
 /* Reset y configuración base */
@@ -492,12 +495,13 @@ section + section {
     left: 10px !important;
   }
 
-  div[style*="position: fixed"][style*="bottom: 40px"] button {
+  /* Don't override explicit FABs used by chatbot/audio components */
+  div[style*="position: fixed"][style*="bottom: 40px"] button:not(.chatbot-fab):not(.audio-fab) {
     width: 50px !important;
     height: 50px !important;
   }
 
-  div[style*="position: fixed"][style*="bottom: 40px"] svg {
+  div[style*="position: fixed"][style*="bottom: 40px"] button:not(.chatbot-fab):not(.audio-fab) svg {
     width: 22px !important;
     height: 22px !important;
   }
@@ -513,7 +517,7 @@ section + section {
 
 /* Corrección para vista móvil - Botón de volumen */
 @media (max-width: 480px) {
-  div[style*="position: fixed"][style*="bottom: 40px"] button {
+  div[style*="position: fixed"][style*="bottom: 40px"] button:not(.chatbot-fab):not(.audio-fab) {
     width: 45px !important;
     height: 45px !important;
     border-radius: 50%; /* Garantizar forma perfectamente circular */

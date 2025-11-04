@@ -1,0 +1,40 @@
+.koxol-fab {
+  --fab-size: 64px;
+  /* Force exact size and disable padding overrides from global rules */
+  width: var(--fab-size) !important;
+  height: var(--fab-size) !important;
+  min-width: var(--fab-size) !important;
+  min-height: var(--fab-size) !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  cursor: pointer !important;
+  overflow: hidden !important;
+  background: #4CAF50 !important;
+  color: #fff !important;
+  box-shadow: 0 8px 32px rgba(45,80,22,0.18) !important;
+  font-size: 0 !important; /* hide any text fallback */
+}
+
+.koxol-fab:focus {
+  outline: 3px solid rgba(21,128,61,0.25);
+}
+
+.koxol-fab svg {
+  width: 56%;
+  height: 56%;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .koxol-fab {
+    width: calc(var(--fab-size) * 0.8) !important;
+    height: calc(var(--fab-size) * 0.8) !important;
+    min-width: calc(var(--fab-size) * 0.8) !important;
+    min-height: calc(var(--fab-size) * 0.8) !important;
+  }
+}

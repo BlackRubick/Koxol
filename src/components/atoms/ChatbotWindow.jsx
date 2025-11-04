@@ -6,6 +6,7 @@ const ChatbotWindow = () => {
   const [input, setInput] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiAvailable, setAiAvailable] = useState(false);
+  const [useRemote, setUseRemote] = useState(false);
   const modelRef = useRef(null);
 
   const options = [
@@ -55,7 +56,37 @@ const ChatbotWindow = () => {
     // Si la IA está disponible, la usamos; si no, usamos el fallback por opciones
     let botReplyText = '';
 
-    if (aiAvailable && modelRef.current) {
+    // Opción 1: usar el proxy remoto en el servidor (Vercel) -> /api/hf-proxy
+    if (useRemote) {
+      try {
+        const resp = await fetch('/api/hf-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: input })
+        });
+
+        const contentType = resp.headers.get('content-type') || '';
+        let serverText = '';
+
+        if (contentType.includes('application/json')) {
+          const json = await resp.json();
+          // Varias formas en que HF puede responder; intentamos obtener texto legible
+          if (typeof json === 'string') serverText = json;
+          else if (Array.isArray(json) && json.length > 0) {
+            serverText = json[0].generated_text || json[0].text || JSON.stringify(json[0]);
+          } else if (json?.generated_text) serverText = json.generated_text;
+          else serverText = JSON.stringify(json);
+        } else {
+          // Texto plano u otros
+          serverText = await resp.text();
+        }
+
+        botReplyText = serverText || 'El servidor respondió pero no devolvió texto.';
+      } catch (err) {
+        console.error('Error llamando al proxy remoto:', err);
+        botReplyText = 'Hubo un error al comunicarse con el servidor de IA.';
+      }
+    } else if (aiAvailable && modelRef.current) {
       try {
         const prompt = input;
         const output = await modelRef.current(prompt);
@@ -120,6 +151,14 @@ const ChatbotWindow = () => {
             {aiLoading ? 'Cargando modelo...' : 'Activar IA (carga en navegador)'}
           </button>
         )}
+
+        {/* Toggle para usar proxy remoto en Vercel (/api/hf-proxy) */}
+        <button
+          onClick={() => setUseRemote(r => !r)}
+          style={{ fontSize: 12 }}
+        >
+          {useRemote ? 'Usar Proxy: ON' : 'Usar Proxy: OFF'}
+        </button>
       </div>
 
       <div className="chatbot-messages">
