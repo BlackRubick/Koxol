@@ -1,4 +1,11 @@
 export default async function handler(req, res) {
+  // Diagnostic GET: allows checking that the serverless function is reachable and
+  // whether HF_TOKEN is present in the environment (we do NOT return the token).
+  if (req.method === 'GET') {
+    res.status(200).json({ ok: true, hasToken: !!process.env.HF_TOKEN, env: process.env.VERCEL_ENV || 'local' });
+    return;
+  }
+
   // Este endpoint actúa como proxy a Hugging Face Router para ocultar la clave en producción.
   // Requisitos: configurar HF_TOKEN y HF_MODEL en las variables de entorno del servidor (ej. Vercel).
 
