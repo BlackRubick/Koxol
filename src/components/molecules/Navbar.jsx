@@ -5,7 +5,6 @@ import { FaUserCircle } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../atoms/Button';
 import CartIcon from '../atoms/CartIcon';
-import MembershipCard from '../atoms/MembershipCard';
 import './Navbar.css';
 
 const Navbar = ({ cartCount = 0 }) => {
@@ -13,7 +12,6 @@ const Navbar = ({ cartCount = 0 }) => {
   const navigate = useNavigate();
   const { isLoggedIn, userData, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const activeMemberships = userData?.memberships?.filter?.(m => m.active) || [];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,40 +63,28 @@ const Navbar = ({ cartCount = 0 }) => {
             <li><a href="/#empresa" className="koxol-navbar__link" onClick={() => navigate('/#empresa')}>Empresa</a></li>
             <li><a href="/blog" className="koxol-navbar__link">Blog</a></li>
             <li><a href="/#metrics" className="koxol-navbar__link">Métricas</a></li>
+            <div className="navbar-translate-mobile">
+  <div className="navbar-translate-wrapper">
+  <div id="google_translate_element"></div>
+</div>
+</div>
           </ul>
 
           {/* Acciones Desktop */}
           <div className="koxol-navbar__actions koxol-navbar__actions--desktop">
             {isLoggedIn && userData ? (
               <>
-                <div className="koxol-navbar__profile">
-                  <FaUserCircle />
-                  <span style={{ fontWeight: '500', color: '#33691E' }}>
-                    {userData.name.split(' ')[0]}
-                  </span>
-                  <div className="koxol-navbar__profile-dropdown">
-                    <p><strong>Nombre:</strong> {userData.name}</p>
-                    <p><strong>Email:</strong> {userData.email}</p>
-
-                    {/* Show active memberships if any */}
-                    {activeMemberships && activeMemberships.length > 0 ? (
-                      <div style={{ marginTop: 8 }}>
-                        <strong>Membresías activas:</strong>
-                        <div style={{ marginTop: 6 }}>
-                          {activeMemberships.map((m) => (
-                            <MembershipCard key={m.id} membership={m} />
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <p style={{ marginTop: 8 }}><em>No tienes membresías activas</em></p>
-                    )}
-
-                    <div style={{ marginTop: 8 }}>
-                      <button onClick={handleLogout}>Cerrar sesión</button>
-                    </div>
-                  </div>
-                </div>
+<div className="koxol-navbar__profile">
+  <FaUserCircle />
+  <span style={{ fontWeight: '500', color: '#33691E' }}>
+    {userData.name.split(' ')[0]}
+  </span>
+  <div className="koxol-navbar__profile-dropdown">
+    <p><strong>Nombre:</strong> {userData.name}</p>
+    <p><strong>Email:</strong> {userData.email}</p>
+    <button onClick={handleLogout}>Cerrar sesión</button>
+  </div>
+</div>
 
                 <div onClick={handleCartClick} className="koxol-navbar__cart">
                   <CartIcon count={cartCount} />
@@ -129,6 +115,7 @@ const Navbar = ({ cartCount = 0 }) => {
         {/* Menú Móvil */}
         <div className={`koxol-navbar__mobile-menu ${menuOpen ? 'open' : ''}`}>
           <ul className="koxol-navbar__mobile-links">
+            
             <li><a href="/#beneficios" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Beneficios</a></li>
             <li><a href="/#catalogo" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Catálogo</a></li>
             <li><a href="/#historia" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Historia</a></li>
@@ -141,7 +128,6 @@ const Navbar = ({ cartCount = 0 }) => {
             <li><a href="/#empresa" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Empresa</a></li>
             <li><a href="/blog" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Blog</a></li>
             <li><a href="/#metrics" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Métricas</a></li>
-
             <li className="koxol-navbar__dropdown">
               <ul className="koxol-navbar__dropdown-menu">
                 
@@ -161,6 +147,9 @@ const Navbar = ({ cartCount = 0 }) => {
             )}
           </div>
         </div>
+          <div className="navbar-translate-wrapper">
+  <div id="google_translate_element"></div>
+</div>
       </div>
 
       {/* Overlay */}

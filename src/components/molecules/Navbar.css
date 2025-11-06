@@ -589,3 +589,65 @@
     padding-left: 1rem;
   }
 }
+/* Contenedor para ajustar el traductor dentro del navbar */
+.navbar-translate-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+/* Ajuste visual del select de Google */
+.goog-te-gadget {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  color: #333 !important;
+}
+
+/* Quita fondo y borde feo */
+.goog-te-gadget-simple {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.goog-te-gadget-simple:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Quita el borde del icono y texto */
+.goog-te-menu-value {
+  color: #333 !important;
+  text-decoration: none !important;
+}
+
+/* Ajuste del ícono */
+.goog-te-gadget-icon {
+  display: none !important; /* Si quieres ocultar el logo de Google */
+}
+
+/* Opcional: compactar el desplegable */
+.goog-te-combo {
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
+  border: 1px solid #ccc !important;
+}
+
+.navbar-translate-mobile {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.navbar-translate-mobile .goog-te-gadget-simple {
+  background-color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}

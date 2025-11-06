@@ -376,10 +376,7 @@ function App() {
         </button>
       </div>
 
-      {/* Botón para cambiar de idioma */}
-      <button onClick={toggleLanguage} style={{ position: 'fixed', top: '10px', right: '10px' }}>
-        {i18n.language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
-      </button>
+  {/* Google Translate widget moved to Navbar */}
 
       <Routes>
         <Route path="/blog" element={<BlogPage />} />
