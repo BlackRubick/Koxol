@@ -37,7 +37,7 @@ export default function Auth() {
     // Use backend for auth
     {
       try {
-        const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+  const endpoint = isLogin ? '/auth/login' : '/auth/register';
   const res = await fetch(`${base}${endpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

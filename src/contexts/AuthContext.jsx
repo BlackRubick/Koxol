@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       const token = getJSON('authToken', null);
       if (!token) return; // no token -> not logged in
       try {
-        const res = await fetch(`${API_BASE}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+  const res = await fetch(`${API_BASE}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) {
           // token invalid or expired
           removeKey('authToken');

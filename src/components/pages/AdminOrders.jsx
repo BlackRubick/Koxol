@@ -14,7 +14,7 @@ export default function AdminOrders() {
       // Preferir backend centralizado. Si falla, caer al fallback local (fetchOrders).
       try {
         const token = getJSON('authToken') || localStorage.getItem('authToken');
-        const res = await fetch(`${API_BASE}/api/orders`, {
+  const res = await fetch(`${API_BASE}/orders`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
         if (res.ok) {
@@ -121,7 +121,7 @@ export default function AdminOrders() {
     // Intentar confirmar en backend y recibir códigos generados
     const token = getJSON('authToken') || localStorage.getItem('authToken');
     try {
-      const res = await fetch(`${API_BASE}/api/orders/${id}/confirm`, {
+  const res = await fetch(`${API_BASE}/orders/${id}/confirm`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

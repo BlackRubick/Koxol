@@ -9,7 +9,7 @@ const useBackend = true; // force backend usage; falls back to localStorage only
 
 export async function fetchOrders() {
   try {
-    const res = await fetch(`${API_BASE}/api/orders`);
+  const res = await fetch(`${API_BASE}/orders`);
     if (!res.ok) throw new Error('Failed to fetch orders');
     const json = await res.json();
     // backend returns { orders }
@@ -22,7 +22,7 @@ export async function fetchOrders() {
 
 export async function createOrder(order) {
   try {
-    const res = await fetch(`${API_BASE}/api/orders`, {
+  const res = await fetch(`${API_BASE}/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(order)
@@ -45,7 +45,7 @@ export async function createOrder(order) {
 
 export async function updateOrder(id, patch) {
   try {
-    const res = await fetch(`${API_BASE}/api/orders/${id}`, {
+  const res = await fetch(`${API_BASE}/orders/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(patch)
