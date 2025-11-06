@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Minus, Plus, Volume2, VolumeX } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import PaymentModal from '../components/atoms/PaymentModal';
 import { getJSON, setJSON } from '../utils/storage';
 
@@ -12,18 +13,24 @@ const CartFlow = () => {
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [shippingData, setShippingData] = useState({
     fullName: '',
+    email: '',
     address: '',
     zipCode: '',
     houseNumber: '',
     reference: '',
     phone: ''
   });
+  const auth = useAuth();
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const audioRef = useRef(null);
   const [paymentModalMethod, setPaymentModalMethod] = useState(null);
   const [showAwaitingPayment, setShowAwaitingPayment] = useState(false);
+  const [showCouponInput, setShowCouponInput] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const couponInputRef = useRef(null);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -76,6 +83,16 @@ const CartFlow = () => {
     setShowPaymentOptions(true);
   };
 
+  // Helper para emoji de membresía
+    const getMembershipEmoji = (item) => {
+      if (!item || !item.name) return '🎫';
+      const n = item.name.toLowerCase();
+      if (n.includes('básico') || n.includes('basico')) return '🌱';
+      if (n.includes('natural plus') || (n.includes('natural') && n.includes('plus'))) return '👑';
+      if (n.includes('pro') || n.includes('koxol pro') || n.includes("k'oxol")) return '💎';
+      return '🎫';
+    };
+
   const handleConfirmOrder = async (paymentMethod) => {
     console.log('=== CONFIRMANDO ORDEN ===');
     console.log('Datos de envío:', shippingData);
@@ -83,15 +100,15 @@ const CartFlow = () => {
     console.log('Total:', total);
     console.log('Método de pago:', paymentMethod);
 
-    // Construir objeto de pedido y guardarlo en localStorage para que lo vea el admin
     const order = {
       id: Date.now().toString(),
       items: cart,
+      // normalize buyer fields to backend expected shape
       buyer: {
-        nombre: shippingData.fullName,
+        name: shippingData.fullName,
         email: shippingData.email || '',
-        direccion: `${shippingData.address} ${shippingData.houseNumber}`,
-        telefono: shippingData.phone
+        address: `${shippingData.address} ${shippingData.houseNumber}`,
+        phone: shippingData.phone
       },
       paymentMethod: paymentMethod || 'No especificado',
       status: 'pending',
@@ -101,20 +118,21 @@ const CartFlow = () => {
     };
 
     try {
-      // Use API abstraction to create order (falls back to localStorage)
       const { createOrder } = await import('../api/orders');
       await createOrder(order);
     } catch (err) {
       console.error('Error guardando pedido desde CartFlow (API):', err);
     }
 
-    // Limpiar carrito y cerrar checkout
     setCart([]);
     setShowPaymentOptions(false);
     setShowCheckout(false);
-    // Mostrar un pequeño toast o mensaje de espera si se requiere
     setShowAwaitingPayment(true);
-    setTimeout(() => setShowAwaitingPayment(false), 4000);
+    // Mostrar modal de espera unos segundos y luego redirigir al usuario a la tienda
+    setTimeout(() => {
+      setShowAwaitingPayment(false);
+      navigate('/shop');
+    }, 2500);
   };
 
   const updateQty = (id, delta) => {
@@ -151,6 +169,14 @@ const CartFlow = () => {
     return sum + price * qty;
   }, 0);
 
+  const nonMembershipSubtotal = cart.reduce((sum, item) => {
+    if (!validateCartItem(item)) return sum;
+    if (item.isMembership) return sum;
+    const price = parseFloat(item.price);
+    const qty = parseInt(item.qty);
+    return sum + price * qty;
+  }, 0);
+
   const originalTotal = cart.reduce((sum, item) => {
     if (!validateCartItem(item)) return sum;
     const originalPrice = parseFloat(item.originalPrice) || 0;
@@ -159,8 +185,27 @@ const CartFlow = () => {
   }, 0);
 
   const savings = originalTotal - subtotal;
-  const shipping = subtotal >= 500 ? 0 : 50;
-  const total = subtotal + shipping;
+
+  // Determine membership-based discounts / shipping
+  const activeMemberships = (auth?.userData?.memberships || []).filter(m => m && m.active);
+  const membershipDiscountPercent = activeMemberships.length ? Math.max(...activeMemberships.map(m => (m.benefits?.discountPercent || m.discountPercent || 0))) : 0;
+  const membershipProvidesFreeShipping = activeMemberships.some(m => m.benefits?.freeShippingAlways || false);
+  const membershipFreeShippingThreshold = activeMemberships.reduce((acc, m) => {
+    const t = m.benefits?.freeShippingThreshold;
+    if (t == null) return acc;
+    return acc == null ? t : Math.min(acc, t);
+  }, null);
+
+  const shipping = membershipProvidesFreeShipping ? 0 : (nonMembershipSubtotal === 0 ? 0 : ((membershipFreeShippingThreshold != null ? nonMembershipSubtotal >= membershipFreeShippingThreshold : nonMembershipSubtotal >= 500) ? 0 : 50));
+  const totalBeforeDiscount = subtotal + shipping;
+
+  // Apply membership discount first, then coupon
+  const membershipDiscountAmount = Math.round((totalBeforeDiscount * (membershipDiscountPercent || 0)) * 100) / 100;
+  const afterMembership = totalBeforeDiscount - membershipDiscountAmount;
+  const couponDiscountAmount = appliedCoupon ? Math.round((afterMembership * (appliedCoupon.discount || 0)) * 100) / 100 : 0;
+  // total discount shown to user (membership + coupon)
+  const discountAmount = Math.round(((membershipDiscountAmount || 0) + (couponDiscountAmount || 0)) * 100) / 100;
+  const total = Math.round((afterMembership - couponDiscountAmount) * 100) / 100;
 
   const toggleMute = () => {
     if (audioRef.current) {
@@ -184,6 +229,67 @@ const CartFlow = () => {
     setVolume(newVolume);
   };
 
+  useEffect(() => {
+    if (auth?.isLoggedIn && auth.userData) {
+      setShippingData(prev => ({
+        ...prev,
+        fullName: prev.fullName || auth.userData.name || '',
+        email: prev.email || auth.userData.email || ''
+      }));
+    }
+  }, [auth?.isLoggedIn, auth?.userData]);
+
+  const handleOpenCoupon = (e) => {
+    e.preventDefault();
+    const storedWelcome = getJSON('welcomeCoupon', null);
+    const storedShare = getJSON('shareCoupon', null);
+    if (storedWelcome && !storedWelcome.used) {
+      setCouponCode(storedWelcome.code || '');
+    } else if (storedShare && !storedShare.used) {
+      setCouponCode(storedShare.code || '');
+    }
+    setShowCouponInput(true);
+  };
+
+  useEffect(() => {
+    if (showCouponInput && couponInputRef.current) {
+      couponInputRef.current.focus();
+    }
+  }, [showCouponInput]);
+
+  const handleApplyCoupon = (e) => {
+    e.preventDefault();
+    const storedWelcome = getJSON('welcomeCoupon', null);
+    const storedShare = getJSON('shareCoupon', null);
+    if (!couponCode) {
+      alert('Ingresa un código de cupón');
+      return;
+    }
+    const code = couponCode.trim().toUpperCase();
+
+    if (storedWelcome && storedWelcome.code && code === storedWelcome.code.trim().toUpperCase()) {
+      if (storedWelcome.used) { alert('Este cupón ya fue usado.'); return; }
+      if (storedWelcome.expiresAt && new Date(storedWelcome.expiresAt) < new Date()) { alert('El cupón ha expirado'); return; }
+      setAppliedCoupon(storedWelcome);
+      setJSON('welcomeCoupon', { ...storedWelcome, used: true });
+      alert(`Cupón aplicado: ${storedWelcome.code} - ${Math.round((storedWelcome.discount||storedWelcome.discountPercent||0)*100)}%`);
+      setShowCouponInput(false);
+      return;
+    }
+
+    if (storedShare && storedShare.code && code === storedShare.code.trim().toUpperCase()) {
+      if (storedShare.used) { alert('Este cupón ya fue usado.'); return; }
+      if (storedShare.expiresAt && new Date(storedShare.expiresAt) < new Date()) { alert('El cupón ha expirado'); return; }
+      setAppliedCoupon(storedShare);
+      setJSON('shareCoupon', { ...storedShare, used: true });
+      alert(`Cupón aplicado: ${storedShare.code} - ${Math.round((storedShare.discount||storedShare.discountPercent||0)*100)}%`);
+      setShowCouponInput(false);
+      return;
+    }
+
+    alert('Código de cupón inválido');
+  };
+
   return (
     <>
       <style>{`
@@ -198,6 +304,8 @@ const CartFlow = () => {
           background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
           min-height: 100vh;
           width: 100%;
+          /* Permitir scroll principal si hace falta (fallback) */
+          overflow-y: auto;
         }
 
         .header {
@@ -340,7 +448,6 @@ const CartFlow = () => {
           box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
 
-        /* Awaiting payment modal styles */
         .await-overlay {
           position: fixed;
           inset: 0;
@@ -449,9 +556,21 @@ const CartFlow = () => {
           align-items: start;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 1200px) {
           .cart-layout {
             grid-template-columns: 1fr;
+          }
+          
+          .summary {
+            position: static;
+            order: -1;
+            margin-bottom: 2rem;
+            max-height: none;
+            overflow: visible;
+          }
+
+          .cart-items {
+            overflow: visible;
           }
         }
 
@@ -461,6 +580,8 @@ const CartFlow = () => {
           box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
           padding: 2rem;
           animation: fadeInUp 0.5s ease;
+          max-height: none;
+          overflow: visible;
         }
 
         @keyframes fadeInUp {
@@ -535,6 +656,19 @@ const CartFlow = () => {
           border-radius: 10px;
           object-fit: cover;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .membership-emoji {
+          width: 80px;
+          height: 80px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 36px;
+          background: linear-gradient(135deg, #f7fff7 0%, #f0fff4 100%);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+          color: #176c3a;
         }
 
         .item-details {
@@ -728,6 +862,10 @@ const CartFlow = () => {
           position: sticky;
           top: 120px;
           animation: fadeInUp 0.5s ease 0.2s backwards;
+          align-self: start;
+          max-height: calc(100vh - 140px);
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
         }
 
         .summary-title {
@@ -990,6 +1128,24 @@ const CartFlow = () => {
           line-height: 1.4;
         }
 
+        .pm-confirm {
+          background: linear-gradient(135deg, #176c3a 0%, #1a8447 100%);
+          color: white;
+          padding: 12px 24px;
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          font-size: 15px;
+          font-weight: 700;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(23, 108, 58, 0.3);
+        }
+
+        .pm-confirm:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(23, 108, 58, 0.4);
+        }
+
         @media (max-width: 768px) {
           .header-content {
             padding: 1rem;
@@ -999,6 +1155,10 @@ const CartFlow = () => {
             font-size: 1.4rem;
           }
 
+          .logo-sub {
+            font-size: 0.85rem;
+          }
+
           .main-wrapper {
             padding: 1rem;
           }
@@ -1006,22 +1166,107 @@ const CartFlow = () => {
           .cart-items,
           .summary {
             padding: 1.5rem;
-          }
+            max-height: none;
+            overflow: visible;
+            animation: fadeInUp 0.5s ease;
+            /* Permitir scroll interno si el contenido es más alto que la ventana
+               Esto evita que el formulario de envío quede fuera de pantalla sin posibilidad de scrollear */
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
 
           .cart-item {
             grid-template-columns: auto 1fr;
             gap: 12px;
           }
 
-          .item-image {
+          .item-image,
+          .membership-emoji {
             width: 60px;
             height: 60px;
+            font-size: 28px;
           }
 
           .item-controls {
             grid-column: 1 / -1;
             flex-direction: row;
             justify-content: space-between;
+            align-items: center;
+          }
+
+          .item-name {
+            font-size: 14px;
+          }
+
+          .checkout-title {
+            font-size: 24px;
+          }
+
+          .checkout-subtitle {
+            font-size: 14px;
+          }
+
+          .form-group {
+            margin-bottom: 1.2rem;
+          }
+
+          .label {
+            font-size: 13px;
+            margin-bottom: 6px;
+          }
+
+          .input,
+          .textarea {
+            padding: 12px 14px;
+            font-size: 14px;
+          }
+
+          .back-button {
+            padding: 10px 18px;
+            font-size: 14px;
+            margin-bottom: 1.5rem;
+          }
+
+          .back-to-cart-btn {
+            font-size: 14px;
+            margin-bottom: 1.5rem;
+          }
+
+          .summary-title {
+            font-size: 20px;
+          }
+
+          .total-section {
+            padding: 1.2rem;
+          }
+
+          .total-label {
+            font-size: 16px;
+          }
+
+          .total-value {
+            font-size: 22px;
+          }
+
+          .checkout-btn,
+          .confirm-btn {
+            padding: 14px 20px;
+            font-size: 16px;
+          }
+
+          .payment-card {
+            padding: 16px;
+          }
+
+          .payment-icon {
+            font-size: 28px;
+          }
+
+          .payment-label {
+            font-size: 15px;
+          }
+
+          .payment-subtext {
+            font-size: 12px;
           }
 
           .audio-controls {
@@ -1032,6 +1277,201 @@ const CartFlow = () => {
           .mute-button {
             width: 55px;
             height: 55px;
+          }
+
+          .volume-slider {
+            width: 100px;
+          }
+
+          .checkout-form,
+          .payment-options-container {
+            overflow: visible;
+            min-height: auto;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .header-content {
+            padding: 0.8rem;
+          }
+
+          .logo {
+            gap: 6px;
+          }
+
+          .logo-koxol {
+            font-size: 1.2rem;
+          }
+
+          .logo-sub {
+            font-size: 0.75rem;
+          }
+
+          .main-wrapper {
+            padding: 0.8rem;
+          }
+
+          .cart-items,
+          .summary {
+            padding: 1.2rem;
+          }
+
+          .checkout-title {
+            font-size: 20px;
+            margin-bottom: 6px;
+          }
+
+          .checkout-subtitle {
+            font-size: 13px;
+            margin-bottom: 2rem;
+          }
+
+          .form-row {
+            gap: 1rem;
+          }
+
+          .form-group {
+            margin-bottom: 1rem;
+          }
+
+          .input,
+          .textarea {
+            padding: 10px 12px;
+            font-size: 13px;
+          }
+
+          .textarea {
+            min-height: 80px;
+          }
+
+          .back-button,
+          .back-to-cart-btn {
+            padding: 8px 14px;
+            font-size: 13px;
+            margin-bottom: 1rem;
+          }
+
+          .summary {
+            padding: 1rem;
+          }
+
+          .summary-title {
+            font-size: 18px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+          }
+
+          .summary-row {
+            font-size: 14px;
+            padding: 10px 0;
+          }
+
+          .total-section {
+            padding: 1rem;
+            margin-top: 1rem;
+          }
+
+          .total-label {
+            font-size: 15px;
+          }
+
+          .total-value {
+            font-size: 20px;
+          }
+
+          .checkout-btn,
+          .confirm-btn {
+            padding: 12px 18px;
+            font-size: 15px;
+          }
+
+          .disclaimer-text {
+            font-size: 11px;
+            margin-top: 0.8rem;
+          }
+
+          .payment-card {
+            padding: 14px;
+            gap: 12px;
+          }
+
+          .payment-icon {
+            font-size: 24px;
+          }
+
+          .payment-label {
+            font-size: 14px;
+          }
+
+          .payment-subtext {
+            font-size: 11px;
+          }
+
+          .item-image,
+          .membership-emoji {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+          }
+
+          .item-name {
+            font-size: 13px;
+          }
+
+          .qty-controls {
+            padding: 4px;
+            gap: 6px;
+          }
+
+          .qty-btn {
+            width: 30px;
+            height: 30px;
+            padding: 6px;
+          }
+
+          .qty-display {
+            font-size: 14px;
+            min-width: 28px;
+          }
+
+          .item-price {
+            font-size: 16px;
+          }
+
+          .audio-controls {
+            bottom: 15px;
+            left: 15px;
+          }
+
+          .mute-button {
+            width: 50px;
+            height: 50px;
+          }
+
+          .volume-slider {
+            width: 90px;
+          }
+
+          .await-card {
+            width: 95%;
+            max-width: calc(100% - 20px);
+          }
+
+          .await-header {
+            padding: 14px 16px;
+          }
+
+          .await-title {
+            font-size: 16px;
+          }
+
+          .await-content {
+            padding: 18px;
+          }
+
+          .await-body {
+            font-size: 14px;
+            margin-bottom: 14px;
           }
         }
       `}</style>
@@ -1047,16 +1487,11 @@ const CartFlow = () => {
           cart={cart}
           shippingData={shippingData}
           onConfirm={(method) => {
-            // registrar/confirmar orden en consola/estado (no cerramos el modal aquí)
             handleConfirmOrder(method);
-
-            // Si el método requiere pago externo (OXXO / SPEI), mostrar un modal de espera
             if (method === 'SPEI' || method === 'OXXO') {
               setShowAwaitingPayment(true);
-              // opcional: cerrar automáticamente el modal de espera después de unos segundos
               setTimeout(() => setShowAwaitingPayment(false), 8000);
             }
-            // Nota: no cerramos `paymentModalMethod` para que el modal muestre el estado de éxito
           }}
         />
 
@@ -1070,7 +1505,7 @@ const CartFlow = () => {
               <div className="await-content">
                 <p className="await-body">Hemos registrado la instrucción. Esperaremos tu pago y, una vez recibido y verificado (estimado 1–3 horas), te notificaremos sobre tu pedido.</p>
                 <div className="await-actions">
-                  <button className="pm-confirm"  onClick={() => setShowAwaitingPayment(false)}>Entendido</button>
+                  <button className="pm-confirm" onClick={() => setShowAwaitingPayment(false)}>Entendido</button>
                 </div>
               </div>
             </div>
@@ -1143,7 +1578,11 @@ const CartFlow = () => {
                       <div key={item.id}>
                         <div className="cart-item">
                           <input type="checkbox" className="checkbox" defaultChecked />
-                          <img src={item.image} alt={item.name} className="item-image" />
+                          {item.isMembership ? (
+                            <div className="item-image membership-emoji" aria-hidden="true">{getMembershipEmoji(item)}</div>
+                          ) : (
+                            <img src={item.image} alt={item.name} className="item-image" />
+                          )}
                           <div className="item-details">
                             <h3 className="item-name">{item.name}</h3>
                             <button className="remove-btn" onClick={() => removeItem(item.id)}>
@@ -1203,16 +1642,16 @@ const CartFlow = () => {
                               <div 
                                 className="progress-bar"
                                 style={{
-                                  width: `${Math.min((subtotal / 500) * 100, 100)}%`
+                                  width: `${Math.min((nonMembershipSubtotal / 500) * 100, 100)}%`
                                 }}
                               >
                                 <div className="progress-indicator"></div>
                               </div>
                             </div>
                             <p className="shipping-message">
-                              {subtotal >= 500 
+                              {nonMembershipSubtotal >= 500 || nonMembershipSubtotal === 0
                                 ? '¡Felicidades! Tu envío es gratis.'
-                                : `Agrega ${(500 - subtotal).toFixed(2)} más para obtener envío gratis.`
+                                : `Agrega ${(500 - nonMembershipSubtotal).toFixed(2)} más para obtener envío gratis.`
                               }{' '}
                               <a href="#" className="link">Ver productos</a>
                             </p>
@@ -1264,8 +1703,6 @@ const CartFlow = () => {
                         <span className="payment-subtext">Paga con tu cuenta de Mercado Pago</span>
                       </div>
                     </button>
-
-                    {/* PayPal option removed per request */}
                   </div>
                 </div>
               ) : (
@@ -1288,6 +1725,18 @@ const CartFlow = () => {
                       className="input"
                       placeholder="Ej: Juan Pérez García"
                       required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="label">Correo electrónico</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={shippingData.email}
+                      onChange={handleInputChange}
+                      className="input"
+                      placeholder="correo@ejemplo.com"
                     />
                   </div>
 
@@ -1358,10 +1807,6 @@ const CartFlow = () => {
                       required
                     />
                   </div>
-
-                  <button className="confirm-btn" onClick={handleProceedToPayment}>
-                    Siguiente - Seleccionar forma de pago
-                  </button>
                 </div>
               )}
             </div>
@@ -1396,8 +1841,40 @@ const CartFlow = () => {
                 </div>
               )}
 
+              {discountAmount > 0 && (
+                <div className="summary-row">
+                  <span className="summary-label">Descuento</span>
+                  <span className="summary-value-green">-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+
               <div className="coupon-section">
-                <a href="#" className="coupon-link">Ingresar código de cupón</a>
+                {!showCouponInput && !appliedCoupon && (
+                  <a href="#" className="coupon-link" onClick={handleOpenCoupon}>Ingresar código de cupón</a>
+                )}
+
+                {showCouponInput && (
+                  <form onSubmit={handleApplyCoupon} style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
+                    <input
+                      ref={couponInputRef}
+                      type="text"
+                      placeholder="Código de cupón"
+                      value={couponCode}
+                      onChange={e => setCouponCode(e.target.value)}
+                      className="input"
+                      style={{ maxWidth: '220px' }}
+                    />
+                    <button type="submit" className="checkout-btn" style={{ padding: '8px 12px', width: 'auto' }}>Aplicar</button>
+                    <button type="button" className="back-button" onClick={() => setShowCouponInput(false)} style={{ padding: '8px 12px' }}>Cancelar</button>
+                  </form>
+                )}
+
+                {appliedCoupon && (
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontWeight: 800, color: '#176c3a' }}>{Math.round((appliedCoupon.discount||0)*100)}% aplicados</div>
+                    <div style={{ fontSize: '13px', color: '#555' }}>{appliedCoupon.code}</div>
+                  </div>
+                )}
               </div>
 
               <div className="total-section">

@@ -37,7 +37,7 @@ const Loyalty = () => (
       ))}
     </div>
     <div className="koxol-loyalty__cta">
-      <a href="#" className="loyalty__button">Únete gratis</a>
+      <a href="https://meet.google.com/ysj-wwoq-xxq" target="_blank" rel="noopener noreferrer" className="loyalty__button">Únete gratis</a>
     </div>
   </section>
 );

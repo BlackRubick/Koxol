@@ -1,0 +1,47 @@
+.koxol-membership-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  margin: 6px 0;
+  font-size: 13px;
+}
+.koxol-membership-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.koxol-membership-card__plan {
+  color: #33691E;
+  font-weight: 600;
+}
+.koxol-membership-card__discount {
+  background: #f1f8e9;
+  color: #558b2f;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.koxol-membership-card__body p {
+  margin: 4px 0;
+}
+.koxol-membership-card__code {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.koxol-membership-card__copy {
+  margin-left: 8px;
+  background: transparent;
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.koxol-membership-card__benefits {
+  list-style: disc;
+  margin: 6px 0 0 16px;
+  padding: 0;
+}

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { setJSON } from '../../utils/storage';
+import CouponModal from '../atoms/CouponModal';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +17,8 @@ export default function Auth() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [showCoupon, setShowCoupon] = useState(false);
+  const [coupon, setCoupon] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -26,31 +30,89 @@ export default function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    const API_BASE = import.meta.env.VITE_API_BASE || '';
 
-    // Simular autenticación
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Ensure API_BASE has a sensible default for local dev
+    const base = API_BASE || 'http://localhost:4000';
+    // Use backend for auth
+    {
+      try {
+        const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+  const res = await fetch(`${base}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password })
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          setIsLoading(false);
+          alert(json.error || 'Error en autenticación');
+          return;
+        }
 
-    // Lógica de inicio de sesión o registro
+        // json: { token, user }
+        const token = json.token;
+        const user = json.user;
+        if (token) {
+          // persist token in localStorage for AuthContext to pick up
+          setJSON('authToken', token);
+        }
+
+        // if registering, optionally generate welcome coupon locally for UX
+        if (!isLogin) {
+          const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+          const code = `KOXOL-REG-${randomPart}`;
+          const couponObj = { code, discount: 0.2, label: '20% de descuento por registro - KOXOL', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), used: false };
+          setJSON('welcomeCoupon', couponObj);
+          setCoupon(couponObj);
+        }
+
+        // Login into app context (attach token to user object so AuthContext persists it)
+        login({ ...user, token }, () => {
+          setIsLoading(false);
+          if (!isLogin) {
+            setShowCoupon(true);
+            return;
+          }
+          // If user is admin, go to admin orders view
+          if (user && user.role === 'admin') navigate('/admin/orders');
+          else navigate('/shop');
+        });
+      } catch (err) {
+        console.error('Auth error:', err);
+        alert('Error de conexión con el servidor de autenticación');
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // Fallback: local simulated auth (original behavior)
     // Si es el administrador con credenciales conocidas, asignar rol admin
     if (isLogin && formData.email === 'admin@hotmail.com' && formData.password === 'admin123') {
-      const adminUser = {
-        name: 'Administrador',
-        email: formData.email,
-        role: 'admin'
-      };
+      const adminUser = { name: 'Administrador', email: formData.email, role: 'admin' };
       login(adminUser, () => navigate('/admin/orders'));
       setIsLoading(false);
       return;
     }
 
-    const user = {
-      name: formData.name || 'Usuario',
-      email: formData.email,
-      role: 'customer'
-    };
-    login(user, () => navigate('/shop'));
-
-    setIsLoading(false);
+    const user = { name: formData.name || 'Usuario', email: formData.email, role: 'customer' };
+    if (!isLogin) {
+      const generateCoupon = () => {
+        const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const code = `KOXOL-REG-${randomPart}`;
+        const couponObj = { code, discount: 0.2, label: '20% de descuento por registro - KOXOL', expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), used: false };
+        setJSON('welcomeCoupon', couponObj);
+        setCoupon(couponObj);
+      };
+      generateCoupon();
+      login(user, () => { setIsLoading(false); setShowCoupon(true); });
+    } else {
+      login(user, () => {
+        if (user && user.role === 'admin') navigate('/admin/orders');
+        else navigate('/shop');
+      });
+      setIsLoading(false);
+    }
   };
 
   const switchMode = () => {
@@ -692,7 +754,16 @@ export default function Auth() {
               <div>
                 <div className={`auth-form-group ${!isLogin ? 'visible' : 'hidden'}`}>
                   <div className="auth-input-wrapper">
-                    <span className="auth-input-icon">👤</span>
+          {/* Modal del cupón: se muestra tras registrarse */}
+          <CouponModal
+            open={showCoupon}
+            coupon={coupon}
+            onClose={() => {
+              setShowCoupon(false);
+              navigate('/shop');
+            }}
+          />
+
                     <input
                       type="text"
                       name="name"

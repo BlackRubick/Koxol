@@ -3,7 +3,7 @@ import React from 'react';
 import Button from '../atoms/Button';
 import './MembershipCard.css';
 
-const MembershipCard = ({ name, price, priceYear, yearly, benefits, accent, featured, selected, onSelect }) => (
+const MembershipCard = ({ name, price, priceYear, yearly, benefits, accent, featured, selected, onSelect, onAdd }) => (
   <div
     className={`membership-card${featured ? ' featured' : ''}${selected ? ' selected' : ''}`}
     style={{
@@ -22,7 +22,12 @@ const MembershipCard = ({ name, price, priceYear, yearly, benefits, accent, feat
     <ul className="membership-card__benefits">
       {benefits.map(b => <li key={b}>{b}</li>)}
     </ul>
-  <Button variant={selected ? 'primary' : 'secondary'}>Elegir</Button>
+  <Button
+    variant={selected ? 'primary' : 'secondary'}
+    onClick={(e) => { e.stopPropagation(); if (typeof onAdd === 'function') onAdd(); }}
+  >
+    Elegir
+  </Button>
   </div>
 );
 

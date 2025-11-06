@@ -56,35 +56,27 @@ const ChatbotWindow = () => {
     // Si la IA está disponible, la usamos; si no, usamos el fallback por opciones
     let botReplyText = '';
 
-    // Opción 1: usar el proxy remoto en el servidor (Vercel) -> /api/hf-proxy
+    // Opción 1: usar el proxy remoto en el servidor -> configurable via VITE_CHAT_PROXY_URL
     if (useRemote) {
       try {
-        const resp = await fetch('/api/hf-proxy', {
+        const CHAT_PROXY = import.meta.env.VITE_CHAT_PROXY_URL || '/api/chatgpt-proxy';
+        const resp = await fetch(CHAT_PROXY, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt: input })
         });
 
-        const contentType = resp.headers.get('content-type') || '';
-        let serverText = '';
-
-        if (contentType.includes('application/json')) {
-          const json = await resp.json();
-          // Varias formas en que HF puede responder; intentamos obtener texto legible
-          if (typeof json === 'string') serverText = json;
-          else if (Array.isArray(json) && json.length > 0) {
-            serverText = json[0].generated_text || json[0].text || JSON.stringify(json[0]);
-          } else if (json?.generated_text) serverText = json.generated_text;
-          else serverText = JSON.stringify(json);
+        if (!resp.ok) {
+          const errTxt = await resp.text();
+          console.error('chatgpt-proxy error', resp.status, errTxt);
+          botReplyText = 'El servidor de ChatGPT devolvió un error.';
         } else {
-          // Texto plano u otros
-          serverText = await resp.text();
+          const json = await resp.json();
+          botReplyText = json.text || 'El servidor respondió pero no devolvió texto.';
         }
-
-        botReplyText = serverText || 'El servidor respondió pero no devolvió texto.';
       } catch (err) {
-        console.error('Error llamando al proxy remoto:', err);
-        botReplyText = 'Hubo un error al comunicarse con el servidor de IA.';
+        console.error('Error llamando al proxy ChatGPT:', err);
+        botReplyText = 'Hubo un error al comunicarse con el servidor de ChatGPT.';
       }
     } else if (aiAvailable && modelRef.current) {
       try {
@@ -152,12 +144,13 @@ const ChatbotWindow = () => {
           </button>
         )}
 
-        {/* Toggle para usar proxy remoto en Vercel (/api/hf-proxy) */}
+        {/* Toggle para usar proxy remoto en el servidor (ChatGPT) */}
         <button
           onClick={() => setUseRemote(r => !r)}
           style={{ fontSize: 12 }}
+          title="Usar ChatGPT vía proxy en el servidor"
         >
-          {useRemote ? 'Usar Proxy: ON' : 'Usar Proxy: OFF'}
+          {useRemote ? 'Usar ChatGPT: ON' : 'Usar ChatGPT: OFF'}
         </button>
       </div>
 

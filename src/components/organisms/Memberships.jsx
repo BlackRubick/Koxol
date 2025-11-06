@@ -2,6 +2,10 @@
 import React, { useState } from 'react';
 import BillingToggle from '../atoms/BillingToggle';
 import MembershipCard from '../molecules/MembershipCard';
+import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { setJSON } from '../../utils/storage';
 import './Memberships.css';
 
 const memberships = [
@@ -51,6 +55,43 @@ const memberships = [
 const Memberships = () => {
   const [yearly, setYearly] = useState(false);
   const [selected, setSelected] = useState(memberships.find(m => m.featured)?.name || memberships[0].name);
+  const { addToCart } = useCart();
+  const auth = useAuth();
+  const navigate = useNavigate();
+
+  const handleAddMembership = (m) => {
+    // Si el usuario no está logueado, llevar al login/registro
+    if (!auth?.isLoggedIn) {
+      // Guardar la membresía pendiente para añadirla automáticamente después del login
+      const pending = {
+        id: `membership-${m.name.replace(/\s+/g, '-').toLowerCase()}-${yearly ? 'year' : 'month'}`,
+        name: `${m.name} (${yearly ? 'Anual' : 'Mensual'}) - Membresía K'oxol`,
+        price: yearly ? m.priceYear : m.price,
+        originalPrice: yearly ? m.priceYear : m.price,
+        image: null,
+        quantity: 1,
+        isMembership: true,
+        billing: yearly ? 'yearly' : 'monthly'
+      };
+      setJSON('pendingMembership', pending);
+      alert('Debes iniciar sesión o registrarte para adquirir una membresía. Te llevaré al login y la añadiré al carrito después de iniciar sesión.');
+      navigate('/auth');
+      return;
+    }
+
+    const id = `membership-${m.name.replace(/\s+/g, '-').toLowerCase()}-${yearly ? 'year' : 'month'}`;
+    const product = {
+      id,
+      name: `${m.name} (${yearly ? 'Anual' : 'Mensual'}) - Membresía K'oxol`,
+      price: yearly ? m.priceYear : m.price,
+      originalPrice: yearly ? m.priceYear : m.price,
+      image: null,
+      quantity: 1,
+      isMembership: true,
+      billing: yearly ? 'yearly' : 'monthly'
+    };
+    addToCart(product);
+  };
   return (
     <section className="koxol-memberships" id="membresias">
       <h2 className="koxol-memberships__title">Membresías K'oxol</h2>
@@ -63,6 +104,7 @@ const Memberships = () => {
             yearly={yearly}
             selected={selected === m.name}
             onSelect={() => setSelected(m.name)}
+            onAdd={() => handleAddMembership(m)}
           />
         ))}
       </div>

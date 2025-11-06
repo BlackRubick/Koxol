@@ -13,8 +13,10 @@ import Footer from './components/organisms/Footer';
 import ChatbotButton from './components/atoms/ChatbotButton';
 import ChatMessenger from './components/atoms/ChatMessenger';
 import DiscountModal from './components/atoms/DiscountModal';
+import ShareModal from './components/atoms/ShareModal';
 import CookieBanner from './components/atoms/CookieBanner';
-import { useNavigate } from 'react-router-dom';
+import { FaWhatsapp } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router-dom';
 import CustomerService from './components/organisms/CustomerService';
 import Loyalty from './components/organisms/Loyalty';
 import ProductCatalog from './components/organisms/ProductCatalog';
@@ -32,20 +34,23 @@ import SupportSection from './components/organisms/SupportSection';
 import EmpresaPage from './pages/EmpresaPage';
 import BlogPage from './pages/BlogPage';
 import MetricsPage from './pages/MetricsPage';
+import RedeemMembership from './components/pages/RedeemMembership';
 import MetricsSection from './components/organisms/MetricsSection';
 import { Route, Routes } from 'react-router-dom';
-import { getJSON, setJSON } from './utils/storage';
+import { getJSON, setJSON, removeKey } from './utils/storage';
 
 function App() {
   const { t, i18n } = useTranslation();
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(true);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const audioRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const auth = useAuth();
   const { cart, addToCart, removeFromCart, changeQty, clearCart, checkoutOpen, setCheckoutOpen } = useCart();
@@ -67,6 +72,43 @@ function App() {
     }
   }, [auth?.isLoggedIn]);
 
+  // Si el usuario acaba de iniciar sesión y hay una membresía pendiente, añadirla al carrito
+  useEffect(() => {
+    if (auth?.isLoggedIn) {
+      try {
+        const pending = getJSON('pendingMembership', null);
+        if (pending) {
+          addToCart(pending);
+          removeKey('pendingMembership');
+          // Feedback sencillo
+          alert(`Membresía "${pending.name}" añadida a tu carrito.`);
+        }
+      } catch (err) {
+        console.error('Error al procesar membresía pendiente:', err);
+      }
+    }
+  }, [auth?.isLoggedIn]);
+
+  // Escuchar solicitudes de cierre de DiscountModal (ej. cuando se abre el CouponModal)
+  useEffect(() => {
+    const handler = () => setShowDiscountModal(false);
+    window.addEventListener('request-close-discount', handler);
+    return () => window.removeEventListener('request-close-discount', handler);
+  }, []);
+
+  // Mostrar ShareModal al entrar a la página principal (solo una vez por usuario)
+  useEffect(() => {
+    try {
+      const seen = getJSON('seenShareModal', false);
+      if (location && location.pathname === '/' && !seen) {
+        setShowShareModal(true);
+        setJSON('seenShareModal', true);
+      }
+    } catch (err) {
+      console.error('Error leyendo seenShareModal:', err);
+    }
+  }, [location?.pathname]);
+
   const handleAddToCart = (product) => {
     if (!auth?.isLoggedIn) return navigate('/auth');
     addToCart(product);
@@ -80,7 +122,13 @@ function App() {
     const order = {
       id: Date.now().toString(),
       items: cart,
-      buyer: form,
+      // normalize buyer fields to what the backend expects
+      buyer: {
+        name: form.nombre || form.name || '',
+        email: form.email || '',
+        address: form.direccion || form.address || '',
+        phone: form.telefono || form.phone || ''
+      },
       paymentMethod: form.paymentMethod || 'No especificado',
       status: 'pending',
       shippingCarrier: null,
@@ -90,10 +138,17 @@ function App() {
 
     try {
       // Use orders API abstraction to persist order (fallback to localStorage)
-      const { createOrder } = await import('./api/orders');
-      await createOrder(order);
+        const { createOrder } = await import('./api/orders');
+        console.log('Sending order to API:', order);
+        const result = await createOrder(order);
+        console.log('createOrder result:', result);
+        if (!result) {
+          console.error('createOrder returned empty result');
+          alert('No se pudo guardar el pedido en el servidor. Revisa la consola.');
+        }
     } catch (err) {
       console.error('Error guardando pedido (API):', err);
+      alert('Error guardando pedido en el servidor. Revisa la consola para más detalles.');
     }
 
     setOrderSuccess(true);
@@ -233,6 +288,7 @@ function App() {
       </AnimatedSection>
       <Footer />
       <ChatbotButton onClick={() => setChatOpen(o => !o)} />
+      <ShareModal open={showShareModal} onClose={() => setShowShareModal(false)} />
       <ChatMessenger open={chatOpen} onClose={() => setChatOpen(false)} />
       <CookieBanner />
       
@@ -328,6 +384,7 @@ function App() {
       <Routes>
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/metrics" element={<MetricsPage />} />
+        <Route path="/redeem" element={<RedeemMembership />} />
       </Routes>
     </>
   );

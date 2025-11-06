@@ -8,6 +8,7 @@ const CheckoutModal = ({ open, cart, onClose, onConfirm }) => {
     direccion: "",
     telefono: "",
   });
+  const [errors, setErrors] = useState({});
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -15,6 +16,23 @@ const CheckoutModal = ({ open, cart, onClose, onConfirm }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
+    // Validate required fields before sending to parent
+    const nextErrors = {};
+    if (!form.nombre || String(form.nombre).trim().length < 2) nextErrors.nombre = 'Ingresa tu nombre completo';
+    const email = String(form.email || '').trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) nextErrors.email = 'Ingresa un correo electrónico';
+    else if (!emailRegex.test(email)) nextErrors.email = 'Correo inválido';
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      // focus the first invalid field for better UX
+      const firstKey = Object.keys(nextErrors)[0];
+      const el = document.querySelector(`input[name="${firstKey}"]`);
+      if (el && typeof el.focus === 'function') el.focus();
+      return;
+    }
+
     onConfirm(form);
   };
 
@@ -35,6 +53,7 @@ const CheckoutModal = ({ open, cart, onClose, onConfirm }) => {
             onChange={handleChange}
             required
           />
+          {errors.nombre && <div style={{ color: '#b91c1c', fontSize: 13, marginTop: 6 }}>{errors.nombre}</div>}
           <input
             type="email"
             name="email"
@@ -43,6 +62,7 @@ const CheckoutModal = ({ open, cart, onClose, onConfirm }) => {
             onChange={handleChange}
             required
           />
+          {errors.email && <div style={{ color: '#b91c1c', fontSize: 13, marginTop: 6 }}>{errors.email}</div>}
           <input
             type="text"
             name="direccion"
@@ -51,6 +71,7 @@ const CheckoutModal = ({ open, cart, onClose, onConfirm }) => {
             onChange={handleChange}
             required
           />
+          {errors.direccion && <div style={{ color: '#b91c1c', fontSize: 13, marginTop: 6 }}>{errors.direccion}</div>}
           <input
             type="tel"
             name="telefono"
@@ -59,6 +80,7 @@ const CheckoutModal = ({ open, cart, onClose, onConfirm }) => {
             onChange={handleChange}
             required
           />
+          {errors.telefono && <div style={{ color: '#b91c1c', fontSize: 13, marginTop: 6 }}>{errors.telefono}</div>}
           <div className="checkout-summary">
             <h4>Resumen</h4>
             <ul>

@@ -35,8 +35,9 @@ export default function ChatMessenger({ open, onClose }) {
     if (aiAvailable || aiLoading) return;
     setAiLoading(true);
     try {
+      const CHAT_PROXY = import.meta.env.VITE_CHAT_PROXY_URL || '/api/chatgpt-proxy';
       // Llamamos al proxy con un prompt corto para comprobar que está funcionando en el servidor
-      const resp = await fetch('/api/hf-proxy', {
+      const resp = await fetch(CHAT_PROXY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: 'Hola' })
@@ -57,9 +58,10 @@ export default function ChatMessenger({ open, onClose }) {
     }
   };
 
-  // Función que llama al proxy serverless (/api/hf-proxy)
+  // Función que llama al proxy serverless (/api/chatgpt-proxy)
   const hfRequest = async (prompt) => {
-    const res = await fetch('/api/hf-proxy', {
+    const CHAT_PROXY = import.meta.env.VITE_CHAT_PROXY_URL || '/api/chatgpt-proxy';
+    const res = await fetch(CHAT_PROXY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt })
@@ -72,13 +74,31 @@ export default function ChatMessenger({ open, onClose }) {
 
     const data = await res.json();
 
-    // Hugging Face Inference API puede devolver [{ generated_text }] o otros formatos;
-    if (Array.isArray(data) && data.length > 0) {
-      return data[0].generated_text || data[0].generated_text || JSON.stringify(data[0]);
+    // Prefer the simple `text` field returned by our proxy
+    if (data && typeof data.text === 'string') return data.text;
+
+    // Google Generative responses: try common nested paths
+    if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+      return data.candidates[0].content.parts[0].text;
+    }
+    if (data?.candidates?.[0]?.output) {
+      // some models return output array
+      const out = data.candidates[0].output;
+      if (Array.isArray(out) && out[0]?.content?.parts?.[0]?.text) return out[0].content.parts[0].text;
+    }
+
+    // Hugging Face style
+    if (Array.isArray(data) && data.length > 0 && data[0].generated_text) {
+      return data[0].generated_text;
     }
     if (data && data.generated_text) return data.generated_text;
-    // Si el proxy devolvió texto u otro formato, lo convertimos a string
-    return typeof data === 'string' ? data : JSON.stringify(data);
+
+    // Fallback: stringify but try to avoid showing huge raw objects
+    try {
+      return JSON.stringify(data);
+    } catch (e) {
+      return String(data);
+    }
   };
 
   const handleSend = async () => {
@@ -123,7 +143,8 @@ export default function ChatMessenger({ open, onClose }) {
   };
 
   const lastMessage = messages[messages.length - 1];
-  const shouldShowOptions = lastMessage && lastMessage.from === 'bot';
+  // Hide option buttons when AI is active (we want a free-text chat in that case)
+  const shouldShowOptions = lastMessage && lastMessage.from === 'bot' && !aiAvailable;
 
   if (!open) return null;
 

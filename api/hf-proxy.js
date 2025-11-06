@@ -59,6 +59,19 @@ export default async function handler(req, res) {
       return;
     }
 
+    // DEBUG helper: if caller includes ?debug=1 return the parsed payload without
+    // calling Hugging Face. This helps verify that the POST reached the function
+    // and that the body was parsed correctly.
+    try {
+      const url = req.url || '';
+      if (url.includes('debug') || req.headers['x-debug']) {
+        res.status(200).json({ debug: true, receivedBody: body, payload });
+        return;
+      }
+    } catch (e) {
+      // ignore and continue
+    }
+
     // Llamada al nuevo Hugging Face Router
     // Nota: la API clásica api-inference.huggingface.co está deprecada y devuelve 410.
     // Usamos el nuevo endpoint router.huggingface.co/hf-inference/{model}

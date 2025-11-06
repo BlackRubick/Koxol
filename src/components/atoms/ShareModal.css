@@ -1,0 +1,55 @@
+.share-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 10002;
+  padding: 20px;
+}
+
+.share-modal {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 12px 40px rgba(2,6,23,0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.share-modal h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.share-modal p {
+  margin: 0;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.share-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary {
+  background: #25D366; /* WhatsApp green */
+  color: white;
+}
+.btn-secondary {
+  background: #efefef;
+  color: #222;
+}

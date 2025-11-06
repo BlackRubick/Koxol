@@ -1,0 +1,99 @@
+.coupon-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001; /* superior al discount-modal (9999) */
+}
+
+.coupon-modal {
+  width: 92%;
+  max-width: 540px;
+  background: rgba(255,255,255,0.98);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 12px 40px rgba(2,6,23,0.35);
+  position: relative;
+  font-family: inherit;
+}
+
+.coupon-close {
+  position: absolute;
+  right: 10px;
+  top: 6px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.coupon-header h2 {
+  margin: 0 0 6px 0;
+  color: #064e3b;
+}
+
+.coupon-sub {
+  margin: 0 0 12px 0;
+  color: #166534;
+  font-size: 14px;
+}
+
+.coupon-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.coupon-code {
+  display: inline-block;
+  padding: 14px 18px;
+  background: linear-gradient(90deg,#f8fafc,#ecfccb);
+  border: 2px dashed #86efac;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.coupon-details {
+  color: #374151;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.coupon-instruction {
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.coupon-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.coupon-copy, .coupon-close-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.coupon-copy {
+  background: #10b981;
+  color: white;
+}
+
+.coupon-copy:hover { opacity: 0.95 }
+
+.coupon-close-btn {
+  background: transparent;
+  border: 2px solid #d1fae5;
+  color: #064e3b;
+}

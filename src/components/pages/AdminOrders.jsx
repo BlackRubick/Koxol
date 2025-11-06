@@ -1,17 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { Package, User, CreditCard, Truck, CheckCircle, Clock, Mail, Phone, MapPin } from 'lucide-react';
 import { fetchOrders, updateOrder } from '../../api/orders';
+import { getJSON, setJSON } from '../../utils/storage';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
+  const [codesByOrder, setCodesByOrder] = useState({});
+
+  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000';
   
   useEffect(() => {
     (async () => {
+      // Preferir backend centralizado. Si falla, caer al fallback local (fetchOrders).
+      try {
+        const token = getJSON('authToken') || localStorage.getItem('authToken');
+        const res = await fetch(`${API_BASE}/api/orders`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+          const body = await res.json();
+          // backend responde { orders }
+          setOrders(body.orders || body || []);
+          return;
+        }
+        console.warn('Respuesta no OK desde backend orders:', res.status);
+      } catch (err) {
+        console.warn('No fue posible conectar al backend de pedidos, usando fallback local:', err && err.message);
+      }
+
+      // Fallback local (legacy) para entornos donde no hay backend disponible
       try {
         const parsed = await fetchOrders();
         setOrders(parsed || []);
       } catch (err) {
-        console.error('Error cargando pedidos (API):', err);
+        console.error('Error cargando pedidos (fallback local):', err);
         setOrders([]);
       }
     })();
@@ -28,8 +50,109 @@ export default function AdminOrders() {
     }
   };
 
+  // Procesar membresías cuando un pedido que contiene membresías es confirmado
+  // Genera códigos de activación por membresía y los guarda junto al pedido
+  const processMemberships = (order) => {
+    try {
+      const membershipsStore = getJSON('memberships', []) || [];
+      const buyerEmail = order.buyer?.email || null;
+      const now = new Date();
+
+      order.membershipCodes = order.membershipCodes || [];
+
+      (order.items || []).forEach(item => {
+        if (!item || !item.isMembership) return;
+
+        const billing = item.billing || 'monthly';
+        const months = billing === 'yearly' ? 12 : 1;
+        const startedAt = now.toISOString();
+        const expiresAt = new Date(now.getTime() + months * 30 * 24 * 60 * 60 * 1000).toISOString();
+
+        // Inferir descuento por nombre de plan (fallbacks)
+        let discountPercent = 0;
+        const nameLower = (item.name || '').toLowerCase();
+        if (nameLower.includes('básico') || nameLower.includes('basico')) discountPercent = 0.10;
+        if (nameLower.includes('natural')) discountPercent = 0.20;
+        if (nameLower.includes('pro')) discountPercent = 0.30;
+
+        // Generar código de activación con formato: KX-ACT-<planKey>-<M|Y>-<RAND>
+        const planKey = (item.name || 'plan').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const rand = Math.random().toString(36).substring(2, 7).toUpperCase();
+        const code = `KX-ACT-${planKey}-${billing === 'yearly' ? 'Y' : 'M'}-${rand}`;
+
+        const membershipRecord = {
+          id: `memb-${order.id}-${item.id || Math.random().toString(36).slice(2,8)}`,
+          orderId: order.id,
+          activationCode: code,
+          userEmail: buyerEmail,
+          name: item.name,
+          billing,
+          startedAt,
+          expiresAt,
+          discountPercent,
+          grantedAt: new Date().toISOString()
+        };
+
+        membershipsStore.push(membershipRecord);
+        order.membershipCodes.push(code);
+
+        // Si hay un usuario guardado en localStorage que coincide con el email, añadir la membresía al userData
+        try {
+          const storedUser = getJSON('userData', null);
+          if (storedUser && storedUser.email && buyerEmail && storedUser.email.trim().toLowerCase() === buyerEmail.trim().toLowerCase()) {
+            const userMemberships = storedUser.memberships || [];
+            userMemberships.push(membershipRecord);
+            storedUser.memberships = userMemberships;
+            setJSON('userData', storedUser);
+          }
+        } catch (err) {
+          console.error('Error actualizando userData con membresía:', err);
+        }
+      });
+
+      setJSON('memberships', membershipsStore);
+      console.log('Membresías procesadas para pedido', order.id);
+    } catch (err) {
+      console.error('Error procesando membresías:', err);
+    }
+  };
+
   const handleConfirm = async (id) => {
-    const newOrders = orders.map(o => o.id === id ? { ...o, status: 'confirmed', confirmedAt: new Date().toISOString() } : o);
+    // Intentar confirmar en backend y recibir códigos generados
+    const token = getJSON('authToken') || localStorage.getItem('authToken');
+    try {
+      const res = await fetch(`${API_BASE}/api/orders/${id}/confirm`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Error confirming order: ${res.status} ${text}`);
+      }
+      const body = await res.json();
+      // backend devuelve { ok: true, order, generatedCodes }
+      const updatedOrder = body.order || {};
+      const codes = body.generatedCodes || updatedOrder.membershipCodes || [];
+
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, ...(updatedOrder || {}), status: 'confirmed', confirmedAt: updatedOrder.confirmedAt || new Date().toISOString(), membershipCodes: codes } : o));
+      if (codes && codes.length) setCodesByOrder(prev => ({ ...prev, [id]: codes }));
+      return;
+    } catch (err) {
+      console.warn('No se pudo confirmar en backend, aplicando fallback local:', err && err.message);
+    }
+
+    // Fallback local: actualizar estado y crear membresías en localStorage
+    const newOrders = orders.map(o => {
+      if (o.id === id) {
+        const updated = { ...o, status: 'confirmed', confirmedAt: new Date().toISOString() };
+        try { processMemberships(updated); updated.membershipFulfilled = true; } catch (e) { console.error(e); }
+        return updated;
+      }
+      return o;
+    });
     await saveOrders(newOrders);
   };
 
@@ -182,6 +305,20 @@ export default function AdminOrders() {
                         <button className="action-btn action-secondary" style={{ marginLeft:8 }} onClick={()=>navigator.clipboard?.writeText(order.id)}>
                           Copiar ID
                         </button>
+
+                        {/* Mostrar códigos generados (si los hay) */}
+                        {((codesByOrder && codesByOrder[order.id] && codesByOrder[order.id].length) || (order.membershipCodes && order.membershipCodes.length)) && (
+                          <div style={{ marginTop:8, display:'flex', gap:8, alignItems:'center' }}>
+                            <div style={{ fontSize:12, color:'#0f172a', fontWeight:700 }}>Códigos:</div>
+                            <div style={{ fontSize:13, background:'#f8fafc', padding:'8px 10px', borderRadius:8, maxWidth:260, overflowX:'auto' }}>
+                              {(codesByOrder[order.id] || order.membershipCodes || []).join(' • ')}
+                            </div>
+                            <button className="action-btn action-secondary" onClick={() => {
+                              const txt = (codesByOrder[order.id] || order.membershipCodes || []).join('\n');
+                              navigator.clipboard?.writeText(txt);
+                            }}>Copiar códigos</button>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
