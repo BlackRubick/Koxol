@@ -7,7 +7,7 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [codesByOrder, setCodesByOrder] = useState({});
 
-  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000';
+  const API_BASE = import.meta.env.VITE_API_BASE || '/api';
   
   useEffect(() => {
     (async () => {

@@ -1,10 +1,10 @@
 import { getJSON, setJSON } from '../utils/storage';
 
 // Orders API abstraction.
-// Prefer the backend API at VITE_API_BASE (or default to localhost for dev).
+// Prefer the backend API at VITE_API_BASE (or default to same-origin '/api').
 // Endpoints on the backend are mounted under /api, so use /api/orders.
 
-const API_BASE = import.meta?.env?.VITE_API_BASE || 'http://localhost:4000';
+const API_BASE = import.meta?.env?.VITE_API_BASE || '/api';
 const useBackend = true; // force backend usage; falls back to localStorage only if requests fail
 
 export async function fetchOrders() {

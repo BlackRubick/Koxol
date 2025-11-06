@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getJSON, setJSON, removeKey } from '../utils/storage';
 
-// Default to localhost for developer convenience, but prefer explicit VITE_API_BASE
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000';
+// Default to relative '/api' so production builds use the same origin and nginx proxy.
+// Vite injects VITE_API_BASE at build time; if missing, prefer '/api' (not localhost).
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 const AuthContext = createContext(null);
 
@@ -14,8 +15,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const init = async () => {
       if (!API_BASE) {
-        // shouldn't happen because we default to localhost, but keep a guard
-        console.warn('VITE_API_BASE not configured — falling back to http://localhost:4000');
+        // shouldn't happen because we default to '/api', but keep a guard
+        console.warn('VITE_API_BASE not configured — falling back to /api');
         return;
       }
       const token = getJSON('authToken', null);

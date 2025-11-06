@@ -30,10 +30,10 @@ export default function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const API_BASE = import.meta.env.VITE_API_BASE || '';
+  const API_BASE = import.meta.env.VITE_API_BASE || '';
 
-    // Ensure API_BASE has a sensible default for local dev
-    const base = API_BASE || 'http://localhost:4000';
+  // Prefer same-origin relative path in production; fall back to /api when not set
+  const base = API_BASE || '/api';
     // Use backend for auth
     {
       try {
