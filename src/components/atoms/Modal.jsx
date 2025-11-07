@@ -20,6 +20,7 @@ const Modal = ({ product, onClose }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [videoAvailable, setVideoAvailable] = useState(false);
   const [videoBlobUrl, setVideoBlobUrl] = useState(null);
+  const [triedBlobFetch, setTriedBlobFetch] = useState(false);
 
   useEffect(() => {
     const storedComments = getJSON(`comments_${product.id}`, []) || [];
@@ -132,6 +133,39 @@ const Modal = ({ product, onClose }) => {
     };
   }, [videoBlobUrl]);
 
+  // helper to handle video playback errors with more diagnostics and a last-resort retry
+  const handleVideoError = async (e) => {
+    try {
+      const mediaError = e?.currentTarget?.error || null;
+      console.warn('Video playback error event:', { src: e?.currentTarget?.currentSrc, mediaError, product: product.video });
+      // If we haven't tried blob fallback yet, attempt a GET->blob now
+      if (!triedBlobFetch && product.video) {
+        setTriedBlobFetch(true);
+        try {
+          const getRes = await fetch(product.video);
+          if (getRes.ok) {
+            const contentType = getRes.headers.get('content-type') || 'video/mp4';
+            const ab = await getRes.arrayBuffer();
+            const blob = new Blob([ab], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            setVideoBlobUrl(url);
+            // don't immediately hide — let the video element try to play the blob
+            console.info('Retrying playback using blob fallback for', product.video, 'content-type:', contentType);
+            return;
+          } else {
+            console.warn('Fallback GET returned non-ok status', getRes.status, product.video);
+          }
+        } catch (err) {
+          console.warn('Fallback GET failed during onError handler:', err, product.video);
+        }
+      }
+    } catch (err) {
+      console.warn('Error in video error handler:', err);
+    }
+    // if we reach here, disable video to avoid repeated errors
+    setVideoAvailable(false);
+  };
+
   const handleCommentSubmit = () => {
     if (!comment.trim() || rating === 0) return;
 
@@ -209,10 +243,7 @@ const Modal = ({ product, onClose }) => {
                     src={videoBlobUrl}
                     loop
                     muted
-                    onError={(e) => {
-                      console.warn('Blob video playback error, hiding video:', product.video, e);
-                      setVideoAvailable(false);
-                    }}
+                    onError={handleVideoError}
                   />
                 ) : (
                   <video
@@ -224,14 +255,8 @@ const Modal = ({ product, onClose }) => {
                     onClick={(e) => { e.preventDefault(); e.currentTarget.play(); }}
                     onDoubleClick={(e) => { e.preventDefault(); }}
                     onContextMenu={(e) => e.preventDefault()}
-                    onError={(e) => {
-                      console.warn('Video playback error, hiding video:', product.video, e);
-                      setVideoAvailable(false);
-                    }}
-                    onAbort={(e) => {
-                      console.warn('Video aborted, hiding video:', product.video, e);
-                      setVideoAvailable(false);
-                    }}
+                    onError={handleVideoError}
+                    onAbort={handleVideoError}
                   >
                     <source src={product.video} type={(() => {
                       const m = (product.video || '').match(/\.([a-z0-9]+)(?:\?|$)/i);
