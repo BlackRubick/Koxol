@@ -236,14 +236,6 @@ const BlogPage = () => {
       <div className="blog-container">
         {/* Main Content */}
         <div className="blog-main">
-          {/* Filtros */}
-          <div className="blog-filters">
-            <button className="filter-btn active">Todos</button>
-            <button className="filter-btn">Niños</button>
-            <button className="filter-btn">Productos</button>
-            <button className="filter-btn">Consejos</button>
-            <button className="filter-btn">Salud</button>
-          </div>
 
           {/* Grid de Artículos */}
           <div className="blog-grid">
