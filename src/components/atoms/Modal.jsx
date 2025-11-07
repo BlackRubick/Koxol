@@ -18,6 +18,7 @@ const Modal = ({ product, onClose }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [videoAvailable, setVideoAvailable] = useState(false);
 
   useEffect(() => {
     const storedComments = getJSON(`comments_${product.id}`, []) || [];
@@ -36,12 +37,43 @@ const Modal = ({ product, onClose }) => {
   // If this product has a video and we want to show it by default for product id 3,
   // If this product has a video, show the video by default when opening the modal.
   useEffect(() => {
-    if (product.video) {
+    // currentImageIndex will be set after we confirm the video exists
+    setCurrentImageIndex(0);
+  }, [product.id, product.video, product.images.length]);
+
+  // Check if the product video file is reachable on the server (HEAD request)
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      if (!product.video) {
+        if (mounted) setVideoAvailable(false);
+        return;
+      }
+      try {
+        const res = await fetch(product.video, { method: 'HEAD' });
+        if (mounted) {
+          setVideoAvailable(res.ok);
+          if (!res.ok) console.warn(`Video not available: ${product.video}`, res.status);
+        }
+      } catch (err) {
+        if (mounted) {
+          setVideoAvailable(false);
+          console.warn(`Error checking video ${product.video}:`, err);
+        }
+      }
+    };
+    check();
+    return () => { mounted = false; };
+  }, [product.video]);
+
+  // When we know whether video is available, set the currentImageIndex appropriately
+  useEffect(() => {
+    if (videoAvailable) {
       setCurrentImageIndex(product.images.length);
     } else {
       setCurrentImageIndex(0);
     }
-  }, [product.id, product.video, product.images.length]);
+  }, [videoAvailable, product.images.length]);
 
   const handleCommentSubmit = () => {
     if (!comment.trim() || rating === 0) return;
@@ -108,7 +140,7 @@ const Modal = ({ product, onClose }) => {
               {(() => {
                 const imagesCount = product.images.length;
                 // If index points to video (after images)
-                if (product.video && currentImageIndex === imagesCount) {
+                if (product.video && videoAvailable && currentImageIndex === imagesCount) {
                   return (
                     <video
                         src={product.video}
@@ -137,7 +169,7 @@ const Modal = ({ product, onClose }) => {
                 );
               })()}
 
-              { (product.images.length + (product.video ? 1 : 0)) > 1 && (
+              { (product.images.length + (product.video && videoAvailable ? 1 : 0)) > 1 && (
                 <>
                   <button onClick={prevImage} className="image-nav prev" aria-label="Anterior">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -175,7 +207,7 @@ const Modal = ({ product, onClose }) => {
                   </button>
                 ))}
 
-                {product.video && (
+                {product.video && videoAvailable && (
                   <button
                     key="video-thumb"
                     onClick={() => setCurrentImageIndex(product.images.length)}
