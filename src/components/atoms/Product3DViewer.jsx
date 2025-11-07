@@ -93,7 +93,6 @@ export function Product3DViewer() {
     // Animation
     const animate = () => {
       bottleGroup.rotation.y += 0.01; // Ensure rotation is applied
-      console.log('Rotation Y:', bottleGroup.rotation.y); // Debug rotation
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
