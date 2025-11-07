@@ -19,6 +19,7 @@ const Modal = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [videoAvailable, setVideoAvailable] = useState(false);
+  const [videoBlobUrl, setVideoBlobUrl] = useState(null);
 
   useEffect(() => {
     const storedComments = getJSON(`comments_${product.id}`, []) || [];
@@ -52,8 +53,54 @@ const Modal = ({ product, onClose }) => {
       try {
         const res = await fetch(product.video, { method: 'HEAD' });
         if (mounted) {
-          setVideoAvailable(res.ok);
-          if (!res.ok) console.warn(`Video not available: ${product.video}`, res.status);
+          // also verify browser can play this video mime type
+          let playable = false;
+          try {
+            const extMatch = product.video.match(/\.([a-z0-9]+)(?:\?|$)/i);
+            const ext = extMatch ? extMatch[1].toLowerCase() : '';
+            const videoEl = document.createElement('video');
+            const mimeMap = { mp4: 'video/mp4', webm: 'video/webm', ogv: 'video/ogg' };
+            const mime = mimeMap[ext] || '';
+            if (mime && typeof videoEl.canPlayType === 'function') {
+              const can = videoEl.canPlayType(mime);
+              playable = !!can && can !== 'no';
+            }
+          } catch (err) {
+            playable = false;
+          }
+          const okAndPlayable = res.ok && playable;
+          setVideoAvailable(okAndPlayable);
+          if (!okAndPlayable) {
+            console.warn(`Video not available or unsupported: ${product.video}`, { status: res.status, playable });
+            // Try a fallback GET -> blob in case HEAD is blocked or server headers are incorrect
+            try {
+              const getRes = await fetch(product.video);
+              if (getRes.ok) {
+                const contentType = getRes.headers.get('content-type') || 'video/mp4';
+                const ab = await getRes.arrayBuffer();
+                const blob = new Blob([ab], { type: contentType });
+                const url = URL.createObjectURL(blob);
+                if (mounted) {
+                  setVideoBlobUrl(url);
+                  // attempt to set available if browser can play this blob type
+                  try {
+                    const videoEl = document.createElement('video');
+                    const can = typeof videoEl.canPlayType === 'function' ? videoEl.canPlayType(contentType) : '';
+                    if (can && can !== 'no') {
+                      setVideoAvailable(true);
+                      console.info('Video blob fallback available for', product.video);
+                    } else {
+                      console.warn('Blob fetched but browser reports cannot play this type:', contentType);
+                    }
+                  } catch (err) {
+                    console.warn('Error checking blob playability', err);
+                  }
+                }
+              }
+            } catch (err) {
+              console.warn('Fallback GET for video failed:', product.video, err);
+            }
+          }
         }
       } catch (err) {
         if (mounted) {
@@ -74,6 +121,16 @@ const Modal = ({ product, onClose }) => {
       setCurrentImageIndex(0);
     }
   }, [videoAvailable, product.images.length]);
+
+  // Cleanup blob URL when modal unmounts or product changes
+  useEffect(() => {
+    return () => {
+      if (videoBlobUrl) {
+        URL.revokeObjectURL(videoBlobUrl);
+        setVideoBlobUrl(null);
+      }
+    };
+  }, [videoBlobUrl]);
 
   const handleCommentSubmit = () => {
     if (!comment.trim() || rating === 0) return;
@@ -115,6 +172,12 @@ const Modal = ({ product, onClose }) => {
   // Only treat common video container extensions as video (exclude .mpeg/.mp3 podcasts)
   const isVideoSrc = (src) => typeof src === 'string' && /\.(mp4|webm|ogv)$/i.test(src);
 
+  // Precompute some values for rendering
+  const imagesCount = product.images.length;
+  const totalMediaCount = product.images.length + (product.video && videoAvailable ? 1 : 0);
+  const isVideoIndex = product.video && videoAvailable && currentImageIndex === imagesCount;
+  const currentMedia = product.images[currentImageIndex];
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -137,37 +200,58 @@ const Modal = ({ product, onClose }) => {
           {/* Left Column - Images */}
           <div className="modal-images-section">
             <div className="main-image-container">
-              {(() => {
-                const imagesCount = product.images.length;
-                // If index points to video (after images)
-                if (product.video && videoAvailable && currentImageIndex === imagesCount) {
-                  return (
-                    <video
-                        src={product.video}
-                        className="main-video"
-                        playsInline
-                        autoPlay
-                        muted
-                        loop
-                        // Prevent user interactions that pause or enter fullscreen
-                        onClick={(e) => { e.preventDefault(); e.currentTarget.play(); }}
-                        onDoubleClick={(e) => { e.preventDefault(); }}
-                        onPause={(e) => { /* ensure it keeps playing */ e.currentTarget.play(); }}
-                        onContextMenu={(e) => e.preventDefault()}
-                      />
-                  );
-                }
-
-                const currentMedia = product.images[currentImageIndex];
-                if (!currentMedia) return <Product3DViewer />;
-                return (
+              {isVideoIndex ? (
+                videoBlobUrl ? (
+                  <video
+                    className="main-video"
+                    playsInline
+                    controls
+                    src={videoBlobUrl}
+                    loop
+                    muted
+                    onError={(e) => {
+                      console.warn('Blob video playback error, hiding video:', product.video, e);
+                      setVideoAvailable(false);
+                    }}
+                  />
+                ) : (
+                  <video
+                    className="main-video"
+                    playsInline
+                    autoPlay
+                    muted
+                    loop
+                    onClick={(e) => { e.preventDefault(); e.currentTarget.play(); }}
+                    onDoubleClick={(e) => { e.preventDefault(); }}
+                    onContextMenu={(e) => e.preventDefault()}
+                    onError={(e) => {
+                      console.warn('Video playback error, hiding video:', product.video, e);
+                      setVideoAvailable(false);
+                    }}
+                    onAbort={(e) => {
+                      console.warn('Video aborted, hiding video:', product.video, e);
+                      setVideoAvailable(false);
+                    }}
+                  >
+                    <source src={product.video} type={(() => {
+                      const m = (product.video || '').match(/\.([a-z0-9]+)(?:\?|$)/i);
+                      const ext = m ? m[1].toLowerCase() : '';
+                      return ext === 'mp4' ? 'video/mp4' : ext === 'webm' ? 'video/webm' : ext === 'ogv' ? 'video/ogg' : 'video/mp4';
+                    })()} />
+                    Your browser does not support the video tag.
+                  </video>
+                )
+              ) : (
+                currentMedia ? (
                   <img
                     src={currentMedia}
                     alt={`${product.name} ${currentImageIndex + 1}`}
                     className="main-image"
                   />
-                );
-              })()}
+                ) : (
+                  <Product3DViewer />
+                )
+              )}
 
               { (product.images.length + (product.video && videoAvailable ? 1 : 0)) > 1 && (
                 <>
