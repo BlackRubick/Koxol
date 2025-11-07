@@ -6,7 +6,7 @@
   position: sticky;
   top: 0;
   width: 100%;
-  z-index: 1000;
+  z-index: 2000;
   background: rgba(255, 255, 255, 0.95); /* Más opaco para mejor legibilidad */
   backdrop-filter: blur(10px) saturate(180%);
   -webkit-backdrop-filter: blur(10px) saturate(180%); /* Para Safari */
@@ -177,7 +177,7 @@
   border: none;
   cursor: pointer;
   padding: 0.5rem;
-  z-index: 1001;
+  z-index: 2003;
 }
 
 .burger-bar {
@@ -325,7 +325,6 @@
   font-weight: 600;
 }
 
-.koxol-navbar__profile-
 
 
 /* Botón 'Compra ahora' */
@@ -403,7 +402,7 @@
     background: #ffffff; /* Fondo blanco sólido para consistencia */
     border-bottom: 1px solid rgba(161, 136, 127, 0.1);
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1001; /* Asegurar que esté por encima del overlay */
+    z-index: 2002; /* Asegurar que esté por encima del overlay */
   }
   
   .koxol-navbar__mobile-menu.open {
@@ -466,9 +465,9 @@
     background: rgba(0, 0, 0, 0.5); /* Fondo más oscuro para mejor contraste */
     backdrop-filter: none; /* Eliminado el desenfoque */
     -webkit-backdrop-filter: none; /* Eliminado el desenfoque para Safari */
-    z-index: 999;
+    z-index: 2001;
     animation: fadeIn 0.3s ease;
-    pointer-events: none; /* Permitir interacción con el menú móvil */
+    pointer-events: auto; /* Permitir interacción con el overlay (cerrar menú al tocar fuera) */
   }
   
   @keyframes fadeIn {
