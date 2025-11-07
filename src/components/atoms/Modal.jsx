@@ -21,6 +21,7 @@ const Modal = ({ product, onClose }) => {
   const [videoAvailable, setVideoAvailable] = useState(false);
   const [videoBlobUrl, setVideoBlobUrl] = useState(null);
   const [triedBlobFetch, setTriedBlobFetch] = useState(false);
+  const [videoIsLfsPointer, setVideoIsLfsPointer] = useState(false);
 
   useEffect(() => {
     const storedComments = getJSON(`comments_${product.id}`, []) || [];
@@ -77,6 +78,21 @@ const Modal = ({ product, onClose }) => {
             try {
               const getRes = await fetch(product.video);
               if (getRes.ok) {
+                // Detect Git LFS pointer responses (text pointer) before treating as binary
+                try {
+                  const textPreview = await getRes.clone().text();
+                  if (typeof textPreview === 'string' && textPreview.includes('git-lfs') && textPreview.includes('oid sha256')) {
+                    // This is a Git LFS pointer file, not the real binary
+                    if (mounted) {
+                      setVideoIsLfsPointer(true);
+                      setVideoAvailable(false);
+                    }
+                    return;
+                  }
+                } catch (e) {
+                  // ignore text preview errors and continue to try binary path
+                }
+
                 const contentType = getRes.headers.get('content-type') || 'video/mp4';
                 const ab = await getRes.arrayBuffer();
                 const blob = new Blob([ab], { type: contentType });
@@ -144,6 +160,19 @@ const Modal = ({ product, onClose }) => {
         try {
           const getRes = await fetch(product.video);
           if (getRes.ok) {
+            // detect Git LFS pointer
+            try {
+              const txt = await getRes.clone().text();
+              if (typeof txt === 'string' && txt.includes('git-lfs') && txt.includes('oid sha256')) {
+                console.warn('Detected Git LFS pointer during error fallback for', product.video);
+                setVideoIsLfsPointer(true);
+                setVideoAvailable(false);
+                return;
+              }
+            } catch (e) {
+              // ignore
+            }
+
             const contentType = getRes.headers.get('content-type') || 'video/mp4';
             const ab = await getRes.arrayBuffer();
             const blob = new Blob([ab], { type: contentType });
@@ -235,7 +264,37 @@ const Modal = ({ product, onClose }) => {
           <div className="modal-images-section">
             <div className="main-image-container">
               {isVideoIndex ? (
-                videoBlobUrl ? (
+                videoIsLfsPointer ? (
+                  <div className="video-unavailable-lfs">
+                    <img
+                      src={product.image || currentMedia || ''}
+                      alt={`${product.name} poster`}
+                      className="main-image"
+                    />
+                    <div className="lfs-message" style={{ padding: 16 }}>
+                      <p style={{ margin: 0 }}>Vídeo no disponible en el servidor.</p>
+                      <p style={{ margin: '6px 0 12px 0', fontSize: '13px', color: '#666' }}>
+                        Parece que el servidor está sirviendo un puntero Git LFS en vez del archivo real.
+                      </p>
+                      <a
+                        href={product.video}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="download-video-btn"
+                        style={{
+                          display: 'inline-block',
+                          padding: '8px 12px',
+                          background: '#169c7c',
+                          color: '#fff',
+                          borderRadius: 6,
+                          textDecoration: 'none'
+                        }}
+                      >
+                        Descargar vídeo
+                      </a>
+                    </div>
+                  </div>
+                ) : videoBlobUrl ? (
                   <video
                     className="main-video"
                     playsInline
