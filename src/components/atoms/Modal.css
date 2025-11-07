@@ -115,9 +115,9 @@
 
 /* "4K-like" enhancement: stronger sharpen/color pop + smooth transition */
 .main-image {
-  /* SVG sharpen + color adjustments for a more 'crispy' look */
-  filter: url(#modal-sharpen-filter) contrast(1.12) saturate(1.15) brightness(1.03) sepia(0.02);
-  /* slight upscale to give impression of crispness */
+  /* Remove any color adjustments: show original image colors */
+  filter: none !important;
+  /* slight upscale kept for subtle pop but without color changes */
   transform: scale(1.02) translateZ(0);
   transition: transform 220ms ease, filter 220ms ease, box-shadow 220ms ease;
   will-change: transform, filter;
@@ -137,7 +137,7 @@
 /* Slight hover pop for desktops */
 .main-image-container:hover .main-image {
   transform: scale(1.035) translateZ(0);
-  filter: url(#modal-sharpen-filter) contrast(1.18) saturate(1.22) brightness(1.04) sepia(0.02);
+  filter: none !important;
 }
 
 .main-image-container:hover .main-video {
@@ -258,6 +258,14 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Ensure modal thumbnails and images never get color filters */
+.modal-content img,
+.modal-content .main-image,
+.modal-content .thumbnail img {
+  filter: none !important;
+  mix-blend-mode: normal !important;
 }
 
 /* Info Section */
