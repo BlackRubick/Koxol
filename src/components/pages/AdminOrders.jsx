@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Package, User, CreditCard, Truck, CheckCircle, Clock, Mail, Phone, MapPin } from 'lucide-react';
 import { fetchOrders, updateOrder } from '../../api/orders';
+import { confirmDialog } from '../../utils/swal';
 import { getJSON, setJSON } from '../../utils/storage';
 
 export default function AdminOrders() {
@@ -298,7 +299,10 @@ export default function AdminOrders() {
                       </td>
                       <td>
                         {order.status !== 'confirmed' && (
-                          <button className="action-btn action-confirm" onClick={()=>handleConfirm(order.id)}>
+                          <button className="action-btn action-confirm" onClick={async ()=>{
+                              const ok = await confirmDialog('Confirmar pedido', '¿Deseas confirmar este pedido? Esto generará códigos de membresía si aplica.');
+                              if (ok) handleConfirm(order.id);
+                            }}>
                             Confirmar
                           </button>
                         )}

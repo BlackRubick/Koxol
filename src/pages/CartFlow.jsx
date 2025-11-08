@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import PaymentModal from '../components/atoms/PaymentModal';
 import { getJSON, setJSON } from '../utils/storage';
+import { showAlert, showError, showSuccess, confirmDialog } from '../utils/swal';
 
 const CartFlow = () => {
   const { cart, setCart } = useCart();
@@ -65,17 +66,17 @@ const CartFlow = () => {
     
     if (!shippingData.fullName || !shippingData.address || !shippingData.zipCode || 
         !shippingData.houseNumber || !shippingData.phone) {
-      alert('Por favor completa todos los campos requeridos');
+      showError('Datos incompletos', 'Por favor completa todos los campos requeridos');
       return;
     }
     
     if (shippingData.zipCode.length !== 5) {
-      alert('El código postal debe tener 5 dígitos');
+      showError('Código postal inválido', 'El código postal debe tener 5 dígitos');
       return;
     }
     
     if (shippingData.phone.length !== 10) {
-      alert('El teléfono debe tener 10 dígitos');
+      showError('Teléfono inválido', 'El teléfono debe tener 10 dígitos');
       return;
     }
     
@@ -262,32 +263,32 @@ const CartFlow = () => {
     const storedWelcome = getJSON('welcomeCoupon', null);
     const storedShare = getJSON('shareCoupon', null);
     if (!couponCode) {
-      alert('Ingresa un código de cupón');
+      showError('Cupón requerido', 'Ingresa un código de cupón');
       return;
     }
     const code = couponCode.trim().toUpperCase();
 
     if (storedWelcome && storedWelcome.code && code === storedWelcome.code.trim().toUpperCase()) {
-      if (storedWelcome.used) { alert('Este cupón ya fue usado.'); return; }
-      if (storedWelcome.expiresAt && new Date(storedWelcome.expiresAt) < new Date()) { alert('El cupón ha expirado'); return; }
-      setAppliedCoupon(storedWelcome);
-      setJSON('welcomeCoupon', { ...storedWelcome, used: true });
-      alert(`Cupón aplicado: ${storedWelcome.code} - ${Math.round((storedWelcome.discount||storedWelcome.discountPercent||0)*100)}%`);
+  if (storedWelcome.used) { showError('Cupón inválido', 'Este cupón ya fue usado.'); return; }
+  if (storedWelcome.expiresAt && new Date(storedWelcome.expiresAt) < new Date()) { showError('Cupón inválido', 'El cupón ha expirado'); return; }
+  setAppliedCoupon(storedWelcome);
+  setJSON('welcomeCoupon', { ...storedWelcome, used: true });
+  showSuccess('Cupón aplicado', `Cupón aplicado: ${storedWelcome.code} - ${Math.round((storedWelcome.discount||storedWelcome.discountPercent||0)*100)}%`);
       setShowCouponInput(false);
       return;
     }
 
     if (storedShare && storedShare.code && code === storedShare.code.trim().toUpperCase()) {
-      if (storedShare.used) { alert('Este cupón ya fue usado.'); return; }
-      if (storedShare.expiresAt && new Date(storedShare.expiresAt) < new Date()) { alert('El cupón ha expirado'); return; }
+  if (storedShare.used) { showError('Cupón inválido', 'Este cupón ya fue usado.'); return; }
+  if (storedShare.expiresAt && new Date(storedShare.expiresAt) < new Date()) { showError('Cupón inválido', 'El cupón ha expirado'); return; }
       setAppliedCoupon(storedShare);
       setJSON('shareCoupon', { ...storedShare, used: true });
-      alert(`Cupón aplicado: ${storedShare.code} - ${Math.round((storedShare.discount||storedShare.discountPercent||0)*100)}%`);
+      showSuccess('Cupón aplicado', `Cupón aplicado: ${storedShare.code} - ${Math.round((storedShare.discount||storedShare.discountPercent||0)*100)}%`);
       setShowCouponInput(false);
       return;
     }
 
-    alert('Código de cupón inválido');
+    showError('Cupón inválido', 'Código de cupón inválido');
   };
 
   return (
@@ -1585,7 +1586,10 @@ const CartFlow = () => {
                           )}
                           <div className="item-details">
                             <h3 className="item-name">{item.name}</h3>
-                            <button className="remove-btn" onClick={() => removeItem(item.id)}>
+                              <button className="remove-btn" onClick={async () => {
+                                const ok = await confirmDialog('Eliminar producto', '¿Deseas eliminar este producto del carrito?');
+                                if (ok) removeItem(item.id);
+                              }}>
                               Eliminar
                             </button>
                             <p className="item-available">{item.available} disponibles</p>
@@ -1885,6 +1889,22 @@ const CartFlow = () => {
               {!showCheckout && (
                 <button className="checkout-btn" onClick={() => setShowCheckout(true)}>
                   Continuar compra
+                </button>
+              )}
+
+              {cart && cart.length > 0 && (
+                <button
+                  className="back-button"
+                  style={{ marginTop: '10px', width: '100%' }}
+                  onClick={async () => {
+                    const ok = await confirmDialog('Vaciar carrito', '¿Deseas eliminar todos los productos del carrito?', { confirmButtonText: 'Vaciar', confirmButtonColor: '#dc2626' });
+                    if (ok) {
+                      setCart([]);
+                      showSuccess('Carrito vaciado', 'Se han eliminado todos los productos del carrito.');
+                    }
+                  }}
+                >
+                  Vaciar carrito
                 </button>
               )}
 

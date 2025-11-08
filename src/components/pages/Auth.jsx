@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { setJSON } from '../../utils/storage';
 import CouponModal from '../atoms/CouponModal';
+import { showAlert, showError, showSuccess } from '../../utils/swal';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -46,7 +47,7 @@ export default function Auth() {
         const json = await res.json();
         if (!res.ok) {
           setIsLoading(false);
-          alert(json.error || 'Error en autenticación');
+          showError('Error', json.error || 'Error en autenticación');
           return;
         }
 
@@ -80,7 +81,7 @@ export default function Auth() {
         });
       } catch (err) {
         console.error('Auth error:', err);
-        alert('Error de conexión con el servidor de autenticación');
+        showError('Error de conexión', 'Error de conexión con el servidor de autenticación');
         setIsLoading(false);
       }
       return;

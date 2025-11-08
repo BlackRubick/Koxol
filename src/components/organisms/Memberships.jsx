@@ -6,6 +6,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { setJSON } from '../../utils/storage';
+import { showAlert, showError, showSuccess } from '../../utils/swal';
 import './Memberships.css';
 
 const memberships = [
@@ -73,8 +74,8 @@ const Memberships = () => {
         isMembership: true,
         billing: yearly ? 'yearly' : 'monthly'
       };
-      setJSON('pendingMembership', pending);
-      alert('Debes iniciar sesión o registrarte para adquirir una membresía. Te llevaré al login y la añadiré al carrito después de iniciar sesión.');
+  setJSON('pendingMembership', pending);
+  showAlert('Inicia sesión', 'Debes iniciar sesión o registrarte para adquirir una membresía. Te llevaré al login y la añadiré al carrito después de iniciar sesión.');
       navigate('/auth');
       return;
     }

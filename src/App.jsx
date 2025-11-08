@@ -38,6 +38,7 @@ import RedeemMembership from './components/pages/RedeemMembership';
 import MetricsSection from './components/organisms/MetricsSection';
 import { Route, Routes } from 'react-router-dom';
 import { getJSON, setJSON, removeKey } from './utils/storage';
+import { showAlert, showSuccess, showError } from './utils/swal';
 
 function App() {
   const { t, i18n } = useTranslation();
@@ -81,7 +82,7 @@ function App() {
           addToCart(pending);
           removeKey('pendingMembership');
           // Feedback sencillo
-          alert(`Membresía "${pending.name}" añadida a tu carrito.`);
+          showSuccess('Membresía añadida', `Membresía "${pending.name}" añadida a tu carrito.`);
         }
       } catch (err) {
         console.error('Error al procesar membresía pendiente:', err);
@@ -144,11 +145,11 @@ function App() {
         console.log('createOrder result:', result);
         if (!result) {
           console.error('createOrder returned empty result');
-          alert('No se pudo guardar el pedido en el servidor. Revisa la consola.');
+          showError('Error', 'No se pudo guardar el pedido en el servidor. Revisa la consola.');
         }
     } catch (err) {
       console.error('Error guardando pedido (API):', err);
-      alert('Error guardando pedido en el servidor. Revisa la consola para más detalles.');
+      showError('Error', 'Error guardando pedido en el servidor. Revisa la consola para más detalles.');
     }
 
     setOrderSuccess(true);

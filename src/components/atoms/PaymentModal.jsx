@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { showError, showSuccess, showAlert } from '../../utils/swal';
 
 const PaymentModalCSS = `
 .pm-overlay {
@@ -533,7 +534,7 @@ const PaymentModal = ({ open, onClose, method, amount, cart = [], shippingData =
 
                   const data = await res.json();
                   setProcessing(false);
-                  if (res.ok && (data.init_point || data.sandbox_init_point)) {
+                    if (res.ok && (data.init_point || data.sandbox_init_point)) {
                     const url = data.init_point || data.sandbox_init_point;
                     window.open(url, '_blank');
                     setConfirmed(true);
@@ -542,12 +543,12 @@ const PaymentModal = ({ open, onClose, method, amount, cart = [], shippingData =
                     onConfirm('Mercado Pago');
                   } else {
                     console.error('MP create preference error', data);
-                    alert('No se pudo iniciar Mercado Pago. Revisa la consola.');
+                    showError('Mercado Pago', 'No se pudo iniciar Mercado Pago. Revisa la consola.');
                   }
                 } catch (err) {
                   setProcessing(false);
                   console.error('Error iniciando Mercado Pago', err);
-                  alert('Error iniciando Mercado Pago. Intenta de nuevo.');
+                  showError('Mercado Pago', 'Error iniciando Mercado Pago. Intenta de nuevo.');
                 }
               }}
               disabled={processing || confirmed}
@@ -604,15 +605,15 @@ const PaymentModal = ({ open, onClose, method, amount, cart = [], shippingData =
                     // minimal validation
                     const num = card.number.replace(/\s+/g, '');
                     if (num.length < 12 || !/^[0-9]+$/.test(num)) {
-                      alert('Ingresa un número de tarjeta válido (sólo números)');
+                      showError('Tarjeta inválida', 'Ingresa un número de tarjeta válido (sólo números)');
                       return;
                     }
                     if (!/^\d{2}\/\d{2}$/.test(card.expiry)) {
-                      alert('Formato de vencimiento inválido. Usa MM/AA');
+                      showError('Fecha inválida', 'Formato de vencimiento inválido. Usa MM/AA');
                       return;
                     }
                     if (card.cvc.length < 3) {
-                      alert('Ingresa un CVC válido');
+                      showError('CVC inválido', 'Ingresa un CVC válido');
                       return;
                     }
 
