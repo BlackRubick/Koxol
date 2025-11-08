@@ -13,6 +13,7 @@ import Footer from './components/organisms/Footer';
 import ChatbotButton from './components/atoms/ChatbotButton';
 import ChatMessenger from './components/atoms/ChatMessenger';
 import DiscountModal from './components/atoms/DiscountModal';
+import CartFab from './components/atoms/CartFab';
 import ShareModal from './components/atoms/ShareModal';
 import CookieBanner from './components/atoms/CookieBanner';
 import { FaWhatsapp } from 'react-icons/fa';
@@ -288,7 +289,8 @@ function App() {
         </section>
       </AnimatedSection>
       <Footer />
-      <ChatbotButton onClick={() => setChatOpen(o => !o)} />
+  <CartFab />
+  <ChatbotButton onClick={() => setChatOpen(o => !o)} />
       <ShareModal open={showShareModal} onClose={() => setShowShareModal(false)} />
       <ChatMessenger open={chatOpen} onClose={() => setChatOpen(false)} />
       <CookieBanner />
