@@ -296,7 +296,7 @@ export default function AdminOrders() {
           <div className="stat">
             <div style={{ fontSize:12, color:'#94a3b8' }}>Pedidos totales</div>
             <h3>{orders.length}</h3>
-            <div style={{ fontSize:12, color:'#64748b' }}>Pedidos registrados en localStorage</div>
+            <div style={{ fontSize:12, color:'#64748b' }}>Pedidos registrados </div>
           </div>
           <div className="stat">
             <div style={{ fontSize:12, color:'#94a3b8' }}>Pendientes</div>
