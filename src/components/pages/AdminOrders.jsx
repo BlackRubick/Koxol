@@ -161,6 +161,28 @@ export default function AdminOrders() {
     const newOrders = orders.map(o => o.id === id ? { ...o, shippingCarrier: carrier } : o);
     await saveOrders(newOrders);
   };
+
+  // Enviar mensaje por WhatsApp Web al comprador
+  const sendWhatsApp = (order) => {
+    try {
+      const raw = String(order.buyer?.phone || '').replace(/\D/g, '');
+      if (!raw) return alert('No hay número de teléfono disponible para este pedido');
+
+      let wa = raw.replace(/^0+/, ''); // remove leading zeros
+      // If number already starts with country code (e.g., 52 for Mexico), keep it
+      if (!wa.startsWith('52') && wa.length === 10) {
+        wa = '52' + wa; // assume Mexico if 10 digits
+      }
+
+      const name = order.buyer?.nombre || order.buyer?.name || 'cliente';
+      const msg = `Hola ${name}, tu pedido ${order.id} ha sido confirmado. Pronto te informaremos sobre el envío. ¡Gracias por elegir K'oxol!`;
+      const url = `https://wa.me/${wa}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    } catch (err) {
+      console.error('Error preparando WhatsApp:', err);
+      alert('No se pudo abrir WhatsApp. Revisa la consola.');
+    }
+  };
   return (
     <div className="admin-root" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
       <style>{`
@@ -309,6 +331,16 @@ export default function AdminOrders() {
                         <button className="action-btn action-secondary" style={{ marginLeft:8 }} onClick={()=>navigator.clipboard?.writeText(order.id)}>
                           Copiar ID
                         </button>
+
+                        {order.status === 'confirmed' && order.buyer?.phone && (
+                          <button
+                            className="action-btn"
+                            style={{ marginLeft:8, background: '#25D366', color: '#fff', fontWeight:700 }}
+                            onClick={() => sendWhatsApp(order)}
+                          >
+                            💬 WhatsApp
+                          </button>
+                        )}
 
                         {/* Mostrar códigos generados (si los hay) */}
                         {((codesByOrder && codesByOrder[order.id] && codesByOrder[order.id].length) || (order.membershipCodes && order.membershipCodes.length)) && (
