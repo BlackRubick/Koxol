@@ -351,7 +351,6 @@ export default function AdminOrders() {
                         ))}
                       </td>
                       <td style={{ fontWeight:800, color:'#0f172a' }}>${(order.total||0).toFixed(2)} MXN</td>
-                      <td>{order.paymentMethod || 'No especificado'}</td>
                       <td>
                         <select value={order.shippingCarrier||''} onChange={(e)=>handleCarrierChange(order.id, e.target.value)} style={{ padding:6, borderRadius:8 }}>
                           <option value="">--</option>
