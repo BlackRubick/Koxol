@@ -344,6 +344,10 @@ export default function AdminOrders() {
                       <td>
                         <div style={{ fontWeight:700 }}>{buyerName}</div>
                         <div style={{ fontSize:12, color:'#64748b' }}>{buyerEmail}</div>
+                        {/* Mostrar objeto buyer crudo para depuración: */}
+                        <div style={{ fontSize:11, color:'#94a3b8', marginTop:6, maxWidth:260, whiteSpace:'pre-wrap', overflowX:'auto' }}>
+                          {JSON.stringify(buyerObj, null, 2)}
+                        </div>
                       </td>
                       <td style={{ maxWidth:220 }}>
                         {order.items?.map((it,i)=> (
