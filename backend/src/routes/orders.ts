@@ -5,6 +5,32 @@ import { slugifyPlan, generateActivationCode, addMonths } from '../utils';
 
 const router = express.Router();
 
+// Partial update of order (admin) -> accepts a patch object with allowed fields
+router.patch('/:id', authMiddleware, adminOnly, async (req: any, res) => {
+  try {
+    const id = req.params.id;
+    const patch = req.body || {};
+    const allowed = ['shippingCarrier', 'status', 'items', 'total', 'buyerName', 'buyerEmail', 'buyerData'];
+    const data: any = {};
+    for (const k of allowed) {
+      if (Object.prototype.hasOwnProperty.call(patch, k)) {
+        data[k] = patch[k];
+      }
+    }
+    if (Object.keys(data).length === 0) return res.status(400).json({ error: 'No valid fields to update' });
+
+    // Ensure order exists
+    const existing = await prisma.order.findUnique({ where: { id } });
+    if (!existing) return res.status(404).json({ error: 'Order not found' });
+
+    const updated = await prisma.order.update({ where: { id }, data });
+    return res.json({ order: updated });
+  } catch (err) {
+    console.error('patch order err', err);
+    return res.status(500).json({ error: String(err) });
+  }
+});
+
 // Create order (public)
 router.post('/', async (req: any, res) => {
   try {
