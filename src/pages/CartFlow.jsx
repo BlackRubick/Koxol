@@ -105,12 +105,19 @@ const CartFlow = () => {
       id: Date.now().toString(),
       items: cart,
       // normalize buyer fields to backend expected shape
-      buyer: {
-        name: shippingData.fullName,
-        email: shippingData.email || '',
-        address: `${shippingData.address} ${shippingData.houseNumber}`,
-        phone: shippingData.phone
-      },
+      buyer: (() => {
+        const raw = String(shippingData.phone || '').replace(/\D/g, '');
+        // If the number already includes country code (starts with 52), keep it; otherwise prefix with 52
+        const withCountry = raw.startsWith('52') ? raw : `52${raw}`;
+        // Store phone with + prefix as requested
+        const phoneWithPlus = `+${withCountry}`;
+        return {
+          name: shippingData.fullName,
+          email: shippingData.email || '',
+          address: `${shippingData.address} ${shippingData.houseNumber}`,
+          phone: phoneWithPlus
+        };
+      })(),
       paymentMethod: paymentMethod || 'No especificado',
       status: 'pending',
       shippingCarrier: null,
