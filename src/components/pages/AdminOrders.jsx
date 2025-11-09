@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Package, User, CreditCard, Truck, CheckCircle, Clock, Mail, Phone, MapPin } from 'lucide-react';
 import { fetchOrders, updateOrder } from '../../api/orders';
-import { confirmDialog } from '../../utils/swal';
+import { confirmDialog, showError } from '../../utils/swal';
 import { getJSON, setJSON } from '../../utils/storage';
 
 export default function AdminOrders() {
@@ -39,6 +39,32 @@ export default function AdminOrders() {
       }
     })();
   }, []);
+
+  // DEBUG: log de depuración para inspeccionar cada orden en la vista
+  useEffect(() => {
+    try {
+      if (!orders) {
+        console.log('AdminOrders - orders is null/undefined', orders);
+        return;
+      }
+      if (!orders.length) {
+        console.log('AdminOrders - no orders (length 0)');
+        return;
+      }
+      console.log(`AdminOrders - ${orders.length} order(s) fetched`);
+      orders.forEach((o, idx) => {
+        console.log(`Order[${idx}] id=${o.id}`, o);
+        console.log(` Order[${idx}] buyer object:`, o.buyer);
+        // También loguear campos comunes por separado para que sean fáciles de leer
+        console.log(`  buyer.nombre: ${o.buyer?.nombre || ''}`);
+        console.log(`  buyer.name: ${o.buyer?.name || ''}`);
+        console.log(`  buyer.email: ${o.buyer?.email || ''}`);
+        console.log(`  buyer.phone / telefono / celular: ${o.buyer?.phone || o.buyer?.telefono || o.buyer?.celular || o.buyer?.cel || o.buyer?.phoneNumber || ''}`);
+      });
+    } catch (err) {
+      console.error('AdminOrders - error logging orders', err);
+    }
+  }, [orders]);
 
   const saveOrders = async (newOrders) => {
     setOrders(newOrders);
@@ -163,12 +189,26 @@ export default function AdminOrders() {
   };
 
   // Enviar mensaje por WhatsApp Web al comprador
+  // Intenta obtener el teléfono del comprador de varios campos posibles
+  const getBuyerPhone = (order) => {
+    const b = order?.buyer || {};
+    const candidates = [b.phone, b.telefono, b.celular, b.cel, b.phoneNumber, b.mobile, b.phone_number];
+    for (const c of candidates) {
+      if (!c) continue;
+      const cleaned = String(c).replace(/\D/g, '');
+      if (cleaned) return cleaned;
+    }
+    return null;
+  };
+
   const sendWhatsApp = (order) => {
     try {
-      const raw = String(order.buyer?.phone || '').replace(/\D/g, '');
-      if (!raw) return alert('No hay número de teléfono disponible para este pedido');
+      const raw = getBuyerPhone(order);
+      if (!raw) {
+        return showError('Teléfono no disponible', 'No hay número de teléfono disponible para este pedido');
+      }
 
-      let wa = raw.replace(/^0+/, ''); // remove leading zeros
+      let wa = String(raw).replace(/^0+/, ''); // remove leading zeros
       // If number already starts with country code (e.g., 52 for Mexico), keep it
       if (!wa.startsWith('52') && wa.length === 10) {
         wa = '52' + wa; // assume Mexico if 10 digits
@@ -180,7 +220,7 @@ export default function AdminOrders() {
       window.open(url, '_blank');
     } catch (err) {
       console.error('Error preparando WhatsApp:', err);
-      alert('No se pudo abrir WhatsApp. Revisa la consola.');
+      showError('Error', 'No se pudo abrir WhatsApp. Revisa la consola.');
     }
   };
   return (
