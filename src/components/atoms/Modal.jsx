@@ -17,6 +17,12 @@ const Modal = ({ product, onClose }) => {
   const [comments, setComments] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  // Essence size options (for Esencias para difusor / id 7)
+  const essenceSizes = [
+    { label: '125 ml', value: 125, price: 35 },
+    { label: '250 ml', value: 250, price: 70 }
+  ];
+  const [selectedSize, setSelectedSize] = useState(essenceSizes[0]);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [videoAvailable, setVideoAvailable] = useState(false);
   const [videoBlobUrl, setVideoBlobUrl] = useState(null);
@@ -212,8 +218,23 @@ const Modal = ({ product, onClose }) => {
     setRating(0);
   };
 
-  const handleAddToCart = () => {
-    addToCart({ ...product, quantity }); // Use addToCart from CartContext
+  const handleAddToCart = (e) => {
+    // If this is an essence product, override price and name with selected size
+    const isEssence = String(product.name || '').toLowerCase().includes('esencia') || product.id === 7;
+    let item;
+    if (isEssence) {
+      item = {
+        id: `${product.id}-${selectedSize.value}`,
+        name: `${product.name} ${selectedSize.label}`,
+        price: selectedSize.price,
+        qty: quantity,
+        image: product.image,
+        isMembership: false
+      };
+    } else {
+      item = { id: product.id, name: product.name, price: product.price, qty: quantity, image: product.image, isMembership: false };
+    }
+    addToCart(item);
     setShowSuccessMessage(true);
     setTimeout(() => setShowSuccessMessage(false), 2000);
   };
@@ -240,6 +261,8 @@ const Modal = ({ product, onClose }) => {
   const totalMediaCount = product.images.length + (product.video && videoAvailable ? 1 : 0);
   const isVideoIndex = product.video && videoAvailable && currentImageIndex === imagesCount;
   const currentMedia = product.images[currentImageIndex];
+  const isEssenceProduct = String(product.name || '').toLowerCase().includes('esencia') || String(product.name || '').toLowerCase().includes('esencias') || product.id === 7;
+  const displayedPrice = isEssenceProduct ? selectedSize.price : product.price;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -417,9 +440,22 @@ const Modal = ({ product, onClose }) => {
             </div>
 
             <div className="product-price">
-              <span className="price">${product.price.toLocaleString('es-MX')}</span>
+              <span className="price">${displayedPrice.toLocaleString('es-MX')}</span>
               <span className="currency">MXN</span>
             </div>
+
+            {isEssenceProduct && (
+              <div style={{ marginTop: 8 }}>
+                <label style={{ fontSize: 13, color: '#64748b', marginRight: 8 }}>Tamaño:</label>
+                <select value={selectedSize.value} onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  const s = essenceSizes.find(x => x.value === v) || essenceSizes[0];
+                  setSelectedSize(s);
+                }} style={{ padding: 8, borderRadius: 8 }} onClick={(e) => e.stopPropagation()}>
+                  {essenceSizes.map(s => <option key={s.value} value={s.value}>{s.label} - ${s.price}</option>)}
+                </select>
+              </div>
+            )}
 
             {/* Add to Cart Section */}
             <div className="cart-section">
