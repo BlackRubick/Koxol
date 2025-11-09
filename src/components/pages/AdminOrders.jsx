@@ -327,7 +327,6 @@ export default function AdminOrders() {
                     <th>Comprador</th>
                     <th>Productos</th>
                     <th>Total</th>
-                    <th>Método</th>
                     <th>Paquetería</th>
                     <th>Estado</th>
                     <th>Acciones</th>
