@@ -191,8 +191,8 @@ export default function AdminOrders() {
   // Enviar mensaje por WhatsApp Web al comprador
   // Intenta obtener el teléfono del comprador de varios campos posibles
   const getBuyerPhone = (order) => {
-    const b = order?.buyer || {};
-    const candidates = [b.phone, b.telefono, b.celular, b.cel, b.phoneNumber, b.mobile, b.phone_number];
+    const b = order?.buyer || order?.buyerData || {};
+    const candidates = [b.phone, b.telefono, b.celular, b.cel, b.phoneNumber, b.mobile, b.phone_number, order?.buyerPhone, order?.buyer?.phone, order?.buyerData?.phone];
     for (const c of candidates) {
       if (!c) continue;
       const cleaned = String(c).replace(/\D/g, '');
@@ -334,13 +334,17 @@ export default function AdminOrders() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map(order => (
-                    <tr key={order.id}>
+                  {orders.map(order => {
+                    const buyerObj = order.buyer || order.buyerData || { name: order.buyerName, email: order.buyerEmail };
+                    const buyerName = buyerObj?.nombre || buyerObj?.name || order.buyerName || '';
+                    const buyerEmail = buyerObj?.email || order.buyerEmail || '';
+                    return (
+                      <tr key={order.id}>
                       <td style={{ fontFamily:'monospace', fontSize:13 }}>{order.id}</td>
                       <td>{new Date(order.createdAt).toLocaleString('es-MX')}</td>
                       <td>
-                        <div style={{ fontWeight:700 }}>{order.buyer?.nombre}</div>
-                        <div style={{ fontSize:12, color:'#64748b' }}>{order.buyer?.email}</div>
+                        <div style={{ fontWeight:700 }}>{buyerName}</div>
+                        <div style={{ fontSize:12, color:'#64748b' }}>{buyerEmail}</div>
                       </td>
                       <td style={{ maxWidth:220 }}>
                         {order.items?.map((it,i)=> (
@@ -372,7 +376,7 @@ export default function AdminOrders() {
                           Copiar ID
                         </button>
 
-                        {order.status === 'confirmed' && order.buyer?.phone && (
+                        {order.status === 'confirmed' && (getBuyerPhone(order) || order.buyer?.phone || order.buyerData?.phone) && (
                           <button
                             className="action-btn"
                             style={{ marginLeft:8, background: '#25D366', color: '#fff', fontWeight:700 }}
@@ -397,7 +401,8 @@ export default function AdminOrders() {
                         )}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
