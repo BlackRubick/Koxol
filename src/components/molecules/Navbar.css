@@ -366,6 +366,11 @@
     background: #ffffff !important; /* Fondo sólido blanco */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    /* Use fixed on mobile to avoid position:sticky inconsistencies inside certain webviews/browsers */
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
   }
 
   .koxol-navbar.scrolled {
