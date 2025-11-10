@@ -14,16 +14,29 @@
     <script type="text/javascript">
       function googleTranslateElementInit() {
         console.log('🌍 Inicializando Google Translate...');
-        new google.translate.TranslateElement({
-          pageLanguage: 'es',
-          includedLanguages: 'en,es',
-          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-          autoDisplay: false
-        }, 'google_translate_element');
         
-        console.log('✅ Google Translate inicializado');
+        // Esperar un poco para que React monte los componentes
+        setTimeout(() => {
+          const desktopElement = document.getElementById('google_translate_element');
+          
+          if (desktopElement && !desktopElement.hasChildNodes()) {
+            console.log('✅ Inicializando traductor en desktop/mobile');
+            new google.translate.TranslateElement({
+              pageLanguage: 'es',
+              includedLanguages: 'en,es,fr,de,it,pt',
+              layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+              autoDisplay: false
+            }, 'google_translate_element');
+          }
+        }, 100);
       }
       
+      // Reiniciar cuando la página cambie (para React Router)
+      if (typeof window !== 'undefined') {
+        window.addEventListener('load', () => {
+          setTimeout(googleTranslateElementInit, 500);
+        });
+      }
     </script>
     <script 
       type="text/javascript" 
