@@ -146,6 +146,13 @@ const Navbar = ({ cartCount = 0 }) => {
               </Button>
             )}
           </div>
+          
+          {/* Traductor Google en Móvil */}
+          <div className="navbar-translate-mobile">
+            <div className="navbar-translate-wrapper">
+              <div id="google_translate_element"></div>
+            </div>
+          </div>
         </div>
           <div className="navbar-translate-wrapper">
   <div id="google_translate_element"></div>
