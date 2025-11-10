@@ -42,6 +42,9 @@ const cards = [
 const History = () => (
   <section className="koxol-history" id="historia" style={{ visibility: 'visible', opacity: 1 }}>
     <h2 className="koxol-history__title">Nuestra Historia</h2>
+    <div className="koxol-history__team-image">
+      <img src="/koxolteam.jpeg" alt="Equipo K'oxol" />
+    </div>
     <div className="koxol-history__timeline">
       {timeline.map((item, i) => (
         <TimelineItem key={item.year} {...item} align={i % 2 === 0 ? 'left' : 'right'} />
