@@ -80,7 +80,7 @@ const products = [
     price: 180,
     desc: 'Protección portátil y elegante en color azul.',
     image: '/pulseraazul.jpeg',
-    images: ['/pulseraazulverde.jpeg', '/pulseraazul.jpeg', '/pulsernaatras.jpeg'],
+    images: ['/pulseraazulverde.jpeg', '/pulseraazul.jpeg', '/pulseraatras.jpeg'],
     video: '/pulseraazul3d.mp4'
   }
 ];
