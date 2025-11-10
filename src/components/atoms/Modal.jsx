@@ -280,8 +280,9 @@ const Modal = ({ product, onClose }) => {
   const totalMediaCount = product.images.length + (product.video && videoAvailable ? 1 : 0);
   const isVideoIndex = product.video && videoAvailable && currentImageIndex === imagesCount;
   const currentMedia = product.images[currentImageIndex];
-  const isEssenceProduct = String(product.name || '').toLowerCase().includes('esencia') || String(product.name || '').toLowerCase().includes('esencias') || product.id === 7;
-  const displayedPrice = isEssenceProduct ? selectedSize.price : product.price;
+  // Detect if this product has selectable variants (esencias, velas, etc.)
+  const isVariantProduct = !!variantOptions;
+  const displayedPrice = isVariantProduct && selectedVariant ? selectedVariant.price : product.price;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -463,15 +464,15 @@ const Modal = ({ product, onClose }) => {
               <span className="currency">MXN</span>
             </div>
 
-            {isEssenceProduct && (
+            {isVariantProduct && (
               <div style={{ marginTop: 8 }}>
                 <label style={{ fontSize: 13, color: '#64748b', marginRight: 8 }}>Tamaño:</label>
-                <select value={selectedSize.value} onChange={(e) => {
+                <select value={selectedVariant?.value || ''} onChange={(e) => {
                   const v = parseInt(e.target.value, 10);
-                  const s = essenceSizes.find(x => x.value === v) || essenceSizes[0];
-                  setSelectedSize(s);
+                  const s = (variantOptions || []).find(x => x.value === v) || (variantOptions ? variantOptions[0] : null);
+                  setSelectedVariant(s);
                 }} style={{ padding: 8, borderRadius: 8 }} onClick={(e) => e.stopPropagation()}>
-                  {essenceSizes.map(s => <option key={s.value} value={s.value}>{s.label} - ${s.price}</option>)}
+                  {(variantOptions || []).map(s => <option key={s.value} value={s.value}>{s.label} - ${s.price}</option>)}
                 </select>
               </div>
             )}
