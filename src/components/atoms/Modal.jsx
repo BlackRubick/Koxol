@@ -17,12 +17,32 @@ const Modal = ({ product, onClose }) => {
   const [comments, setComments] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  // Essence size options (for Esencias para difusor / id 7)
+  // Variant size options for products with sizes (esencias, velas)
   const essenceSizes = [
     { label: '125 ml', value: 125, price: 35 },
     { label: '250 ml', value: 250, price: 70 }
   ];
-  const [selectedSize, setSelectedSize] = useState(essenceSizes[0]);
+  const candleSizes = [
+    { label: '8 g', value: 8, price: 35 },
+    { label: '20 g', value: 20, price: 60 }
+  ];
+
+  const detectVariantOptions = (p) => {
+    const name = String(p?.name || '').toLowerCase();
+    if (name.includes('esencia') || name.includes('esencias') || p?.id === 7) return essenceSizes;
+    if (name.includes('vela') || name.includes('velas') || p?.id === 5) return candleSizes;
+    return null;
+  };
+
+  const [variantOptions, setVariantOptions] = useState(detectVariantOptions(product));
+  const [selectedVariant, setSelectedVariant] = useState(variantOptions ? variantOptions[0] : null);
+
+  // Reset variant options/selection whenever the modal opens with a different product
+  useEffect(() => {
+    const opts = detectVariantOptions(product);
+    setVariantOptions(opts);
+    setSelectedVariant(opts ? opts[0] : null);
+  }, [product.id]);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [videoAvailable, setVideoAvailable] = useState(false);
   const [videoBlobUrl, setVideoBlobUrl] = useState(null);
@@ -219,14 +239,13 @@ const Modal = ({ product, onClose }) => {
   };
 
   const handleAddToCart = (e) => {
-    // If this is an essence product, override price and name with selected size
-    const isEssence = String(product.name || '').toLowerCase().includes('esencia') || product.id === 7;
+    const isVariantProduct = !!variantOptions;
     let item;
-    if (isEssence) {
+    if (isVariantProduct && selectedVariant) {
       item = {
-        id: `${product.id}-${selectedSize.value}`,
-        name: `${product.name} ${selectedSize.label}`,
-        price: selectedSize.price,
+        id: `${product.id}-${selectedVariant.value}`,
+        name: `${product.name} ${selectedVariant.label}`,
+        price: selectedVariant.price,
         qty: quantity,
         image: product.image,
         isMembership: false
