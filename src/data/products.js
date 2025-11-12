@@ -82,6 +82,24 @@ const products = [
     image: '/pulseraazul.jpeg',
     images: ['/pulseraazulverde.jpeg', '/pulseraazul.jpeg', '/pulseraatras.jpeg'],
     video: '/pulseraazul3d.mp4'
+  },
+  {
+    id: 11,
+    name: 'Spray Antimosquitos 500ml',
+    price: 110,
+    desc: 'Spray de mayor capacidad para protección duradera.',
+    image: '/sprayfaltafrente.jpeg',
+    images: ['/falta2.jpeg', '/sprayfaltafrente.jpeg', '/sprayfaltaatras.jpeg'],
+    video: null
+  },
+  {
+    id: 12,
+    name: 'Loción Repelente 145ml',
+    price: 230,
+    desc: 'Loción protectora de tamaño ideal para toda la familia.',
+    image: '/locionfaltafrente.jpeg',
+    images: ['/falta1.jpeg', '/locionfaltafrente.jpeg', '/locionatrasfalta.jpeg'],
+    video: null
   }
 ];
 
