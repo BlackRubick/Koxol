@@ -163,7 +163,6 @@ const Navbar = ({ cartCount = 0 }) => {
             <li><a href="/blog" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Blog</a></li>
             <li><a href="/#metrics" className="koxol-navbar__mobile-link" onClick={handleLinkClick}>Métricas</a></li>
             
-            {/* Traductor Móvil - se mueve aquí en móvil asd adasdas*/}
             <li className="navbar-translate-mobile-wrapper"></li>
           </ul>
           

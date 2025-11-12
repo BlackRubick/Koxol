@@ -1,4 +1,3 @@
-// Modal.js
 import React, { useState, useEffect } from 'react';
 import { getJSON, setJSON } from '../../utils/storage';
 import { useAuth } from '../../contexts/AuthContext';

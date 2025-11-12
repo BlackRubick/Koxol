@@ -459,7 +459,6 @@
     min-width: 200px;
   }
   
-  /* Overlay */
   .koxol-navbar__overlay {
     display: block;
     position: fixed;
@@ -467,12 +466,12 @@
     left: 0;
     width: 100%;
     height: calc(100vh - 75px);
-    background: rgba(0, 0, 0, 0.5); /* Fondo más oscuro para mejor contraste */
-    backdrop-filter: none; /* Eliminado el desenfoque */
-    -webkit-backdrop-filter: none; /* Eliminado el desenfoque para Safari */
+    background: rgba(0, 0, 0, 0.5); 
+    backdrop-filter: none; 
+    -webkit-backdrop-filter: none; 
     z-index: 2001;
     animation: fadeIn 0.3s ease;
-    pointer-events: auto; /* Permitir interacción con el overlay (cerrar menú al tocar fuera) */
+    pointer-events: auto; 
   }
   
   @keyframes fadeIn {
@@ -561,7 +560,6 @@
   }
 }
 
-/* Dropdown styles para móvil */
 .koxol-navbar__dropdown {
   position: relative;
 }
@@ -593,7 +591,6 @@
     padding-left: 1rem;
   }
 }
-/* Contenedor para ajustar el traductor dentro del navbar */
 .navbar-translate-wrapper {
   display: flex;
   align-items: center;
@@ -601,14 +598,12 @@
   margin-left: 10px;
 }
 
-/* Ajuste visual del select de Google */
 .goog-te-gadget {
   font-family: 'Inter', sans-serif !important;
   font-size: 13px !important;
   color: #333 !important;
 }
 
-/* Quita fondo y borde feo */
 .goog-te-gadget-simple {
   background-color: transparent !important;
   border: none !important;
@@ -625,18 +620,15 @@
   background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Quita el borde del icono y texto */
 .goog-te-menu-value {
   color: #333 !important;
   text-decoration: none !important;
 }
 
-/* Ajuste del ícono */
 .goog-te-gadget-icon {
-  display: none !important; /* Si quieres ocultar el logo de Google */
+  display: none !important; 
 }
 
-/* Opcional: compactar el desplegable */
 .goog-te-combo {
   border-radius: 8px !important;
   padding: 4px 8px !important;
@@ -657,9 +649,6 @@
 }
 
 
-/* Estilos para el traductor en móvil - agregar al final del archivo Navbar.css */
-
-/* Item del traductor dentro del menú móvil */
 .navbar-translate-mobile-item {
   display: flex;
   justify-content: center;
@@ -670,7 +659,6 @@
   list-style: none;
 }
 
-/* Wrapper del traductor */
 .navbar-translate-mobile-item .navbar-translate-wrapper {
   display: flex;
   align-items: center;
@@ -678,7 +666,6 @@
   width: 100%;
 }
 
-/* Estilos para el widget de Google Translate en móvil */
 .navbar-translate-mobile-item .goog-te-gadget {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
   font-size: 14px !important;
@@ -715,13 +702,10 @@
   color: #558B2F !important;
 }
 
-/* Ocultar el logo de Google si quieres */
 .navbar-translate-mobile-item .goog-te-gadget-icon {
   margin-right: 4px !important;
-  /* Si quieres ocultarlo: display: none !important; */
 }
 
-/* Ajuste para pantallas muy pequeñas */
 @media (max-width: 480px) {
   .navbar-translate-mobile-item {
     padding: 0.8rem 0;
