@@ -392,13 +392,14 @@ function App() {
 
 function AnimatedSection({ children, animation }) {
   const [ref, inView] = useInView({ triggerOnce: false, threshold: 0.2 });
+  const isMobile = window.innerWidth <= 768;
 
   return (
     <motion.div
       ref={ref}
-      initial={animation.initial}
-      animate={inView ? animation.animate : animation.initial}
-      transition={animation.transition}
+      initial={isMobile ? {} : animation.initial}
+      animate={isMobile ? {} : (inView ? animation.animate : animation.initial)}
+      transition={isMobile ? {} : animation.transition}
       style={{ 
         position: 'relative',
         zIndex: 'auto',
