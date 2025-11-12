@@ -90,7 +90,7 @@ const products = [
     desc: 'Spray de mayor capacidad para protección duradera.',
     image: '/sprayfaltafrente.jpeg',
     images: ['/falta2.jpeg', '/sprayfaltafrente.jpeg', '/sprayfaltaatras.jpeg'],
-    video: null
+    video: '/spraygrande.mp4'
   },
   {
     id: 12,
@@ -99,7 +99,7 @@ const products = [
     desc: 'Loción protectora de tamaño ideal para toda la familia.',
     image: '/locionfaltafrente.jpeg',
     images: ['/falta1.jpeg', '/locionfaltafrente.jpeg', '/locionatrasfalta.jpeg'],
-    video: null
+    video: '/locion145.mp4'
   }
 ];
 
